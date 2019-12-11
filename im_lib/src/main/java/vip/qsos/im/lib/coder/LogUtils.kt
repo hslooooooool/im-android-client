@@ -7,18 +7,18 @@ import java.nio.channels.SocketChannel
  * @author : 华清松
  * 日志打印工具类
  */
-class ImLogUtils {
+class LogUtils private constructor() {
 
     companion object {
         const val TAG = "IM服务"
 
-        val logger: ImLogUtils by lazy { Holder.logger }
+        val logger: LogUtils by lazy { Holder.logger }
     }
 
     private var debug = true
 
     private object Holder {
-        val logger = ImLogUtils()
+        val logger = LogUtils()
     }
 
     fun open(mode: Boolean) {

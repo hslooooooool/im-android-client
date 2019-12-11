@@ -1,30 +1,4 @@
-/**
- * Copyright 2013-2019 Xia Jun(3979434@qq.com).
- *
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- *
- * **************************************************************************************
- * *
- * Website : http://www.farsunset.com                           *
- * *
- * **************************************************************************************
- */
 package vip.qsos.im.receiver
-
 
 import android.app.Notification
 import android.app.NotificationChannel
@@ -35,41 +9,34 @@ import android.content.Intent
 import android.net.NetworkInfo
 
 import androidx.core.app.NotificationCompat
-
 import com.farsunset.ichat.example.R
 
 import vip.qsos.im.lib.CIMEventBroadcastReceiver
-import vip.qsos.im.lib.CIMListenerManager
+import vip.qsos.im.lib.IMListenerManager
 import vip.qsos.im.lib.model.Message
 import vip.qsos.im.lib.model.ReplyBody
 import vip.qsos.im.ui.SystemMessageActivity
 
 /**
- * 消息入口，所有消息都会经过这里
- *
- * @author 3979434
+ * @author : 华清松
+ * 消息接收广播服务
  */
 class CIMPushManagerReceiver : CIMEventBroadcastReceiver() {
 
     //当收到消息时，会执行onMessageReceived，这里是消息第一入口
-
     override fun onMessageReceived(message: Message, intent: Intent) {
-
         //调用分发消息监听
-        CIMListenerManager.notifyOnMessageReceived(message)
-
-        //以开头的为动作消息，无须显示,如被强行下线消息Constant.ACTION_999
-        if (message.action.startsWith("9")) {
+        IMListenerManager.notifyOnMessageReceived(message)
+        //以9开头的消息无须广播,如被强行下线消息Constant.ACTION_999
+        if (message.action?.startsWith("9") == true) {
             return
         }
-
         showNotify(context, message)
     }
 
-
+    /**消息广播*/
     private fun showNotify(context: Context, msg: Message) {
-
-        val notificationManager =
+        val notificationManager: NotificationManager =
             context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
         var channelId: String? = null
@@ -80,7 +47,6 @@ class CIMPushManagerReceiver : CIMEventBroadcastReceiver() {
             channel.enableLights(true) //是否在桌面icon右上角展示小红点   
             notificationManager.createNotificationChannel(channel)
         }
-
         val title = "系统消息"
         val contentIntent = PendingIntent.getActivity(
             context,
@@ -99,35 +65,27 @@ class CIMPushManagerReceiver : CIMEventBroadcastReceiver() {
         builder.setDefaults(Notification.DEFAULT_LIGHTS)
         builder.setContentIntent(contentIntent)
         val notification = builder.build()
-
-
         notificationManager.notify(R.drawable.icon, notification)
-
     }
-
 
     fun onNetworkChanged(info: NetworkInfo) {
-        CIMListenerManager.notifyOnNetworkChanged(info)
+        IMListenerManager.notifyOnNetworkChanged(info)
     }
 
-
     override fun onConnectionSuccessed(hasAutoBind: Boolean) {
-        CIMListenerManager.notifyOnConnectionSuccessed(hasAutoBind)
+        IMListenerManager.notifyOnConnectionSuccess(hasAutoBind)
     }
 
     override fun onConnectionClosed() {
-        CIMListenerManager.notifyOnConnectionClosed()
+        IMListenerManager.notifyOnConnectionClosed()
     }
-
 
     override fun onReplyReceived(body: ReplyBody) {
-        CIMListenerManager.notifyOnReplyReceived(body)
+        IMListenerManager.notifyOnReplyReceived(body)
     }
 
-
     override fun onConnectionFailed() {
-        // TODO Auto-generated method stub
-        CIMListenerManager.notifyOnConnectionFailed()
+        IMListenerManager.notifyOnConnectionFailed()
     }
 
 }

@@ -36,7 +36,7 @@ class SplanshActivity : CIMMonitorActivity() {
         view.startAnimation(aa)
     }
 
-    override fun onConnectionSuccessed(autoBind: Boolean) {
+    override fun onConnectionSuccess(autoBind: Boolean) {
 
         val intent = Intent(this@SplanshActivity, LoginActivity::class.java)
         startActivity(intent)

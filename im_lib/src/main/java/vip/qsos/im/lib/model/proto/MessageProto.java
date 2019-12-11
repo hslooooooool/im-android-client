@@ -459,6 +459,7 @@ public final class MessageProto {
         /**
          * <code>optional string format = 8;</code>
          */
+        @Override
         public String getFormat() {
             return format_;
         }

@@ -10,7 +10,7 @@ import kotlinx.android.synthetic.main.activity_login.*
 import vip.qsos.im.app.CIMMonitorActivity
 import vip.qsos.im.app.Constant
 import vip.qsos.im.lib.CIMPushManager
-import vip.qsos.im.lib.constant.CIMConstant
+import vip.qsos.im.lib.constant.IMConstant
 import vip.qsos.im.lib.model.ReplyBody
 
 class LoginActivity : CIMMonitorActivity(), OnClickListener {
@@ -43,7 +43,7 @@ class LoginActivity : CIMMonitorActivity(), OnClickListener {
         }
     }
 
-    override fun onConnectionSuccessed(autoBind: Boolean) {
+    override fun onConnectionSuccess(autoBind: Boolean) {
         if (!autoBind) {
             CIMPushManager.bindAccount(this, account_1.text.toString().trim { it <= ' ' })
         }
@@ -53,7 +53,7 @@ class LoginActivity : CIMMonitorActivity(), OnClickListener {
     override fun onReplyReceived(reply: ReplyBody) {
         progressDialog.dismiss()
         /*收到code为200的回应 账号绑定成功*/
-        if (reply.key == CIMConstant.RequestKey.CLIENT_BIND && reply.code == CIMConstant.ReturnCode.CODE_200) {
+        if (reply.key == IMConstant.RequestKey.CLIENT_BIND && reply.code == IMConstant.ReturnCode.CODE_200) {
             val intent = Intent(this, SystemMessageActivity::class.java)
             intent.putExtra("account", account_1.text.toString().trim { it <= ' ' })
             startActivity(intent)

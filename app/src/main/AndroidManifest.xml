@@ -47,18 +47,18 @@
             android:launchMode="singleTop"
             android:screenOrientation="portrait" />
 
-        <!-- ****************************************CIM推送配置 begin*************************************** -->
+        <!-- ****************************************IM推送配置 begin*************************************** -->
         <service
-            android:name="vip.qsos.im.lib.CIMPushService"
-            android:process=":cimpush" />
+            android:name="vip.qsos.im.lib.IMPushService"
+            android:process=":im_push" />
 
         <provider
-            android:name="vip.qsos.im.lib.CIMCacheProvider"
-            android:authorities="${applicationId}.cim.provider"
+            android:name="vip.qsos.im.lib.IMCacheProvider"
+            android:authorities="${applicationId}.provider"
             android:exported="false"
-            android:process=":cimpush" />
+            android:process=":im_push" />
         <!-- android:authorities="${package}.cim.provider"-->
-        <!-- ****************************************CIM推送配置 end*************************************** -->
+        <!-- ****************************************IM推送配置 end*************************************** -->
 
         <!--消息接受广播注册-->
         <receiver android:name="vip.qsos.im.receiver.CIMPushManagerReceiver">

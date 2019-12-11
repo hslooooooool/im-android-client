@@ -6,16 +6,17 @@ import android.content.Intent
 import android.net.ConnectivityManager
 import android.os.Build
 
-import vip.qsos.im.lib.constant.CIMConstant
+import vip.qsos.im.lib.constant.IMConstant
 import vip.qsos.im.lib.model.Message
 import vip.qsos.im.lib.model.ReplyBody
-import vip.qsos.im.lib.model.SentBody
+import vip.qsos.im.lib.model.SendBody
 
 /**
- * 消息入口，所有消息都会经过这里
+ * @author : 华清松
+ * 消息接收广播服务
  */
 abstract class CIMEventBroadcastReceiver : BroadcastReceiver() {
-    private lateinit var context: Context
+    lateinit var context: Context
 
     override fun onReceive(context: Context, intent: Intent) {
         this.context = context
@@ -29,30 +30,30 @@ abstract class CIMEventBroadcastReceiver : BroadcastReceiver() {
 
         /*设备网络状态变化事件*/
         if (
-            intent.action == CIMConstant.IntentAction.ACTION_NETWORK_CHANGED
+            intent.action == IMConstant.IntentAction.ACTION_NETWORK_CHANGED
             || intent.action == ConnectivityManager.CONNECTIVITY_ACTION
         ) {
             onDevicesNetworkChanged()
         }
 
         /*断开服务器事件*/
-        if (intent.action == CIMConstant.IntentAction.ACTION_CONNECTION_CLOSED) {
+        if (intent.action == IMConstant.IntentAction.ACTION_CONNECTION_CLOSED) {
             onInnerConnectionClosed()
         }
 
         /*连接服务器失败事件*/
-        if (intent.action == CIMConstant.IntentAction.ACTION_CONNECTION_FAILED) {
-            val interval = intent.getLongExtra("interval", CIMConstant.RECONN_INTERVAL_TIME)
+        if (intent.action == IMConstant.IntentAction.ACTION_CONNECTION_FAILED) {
+            val interval = intent.getLongExtra("interval", IMConstant.RECONNECT_INTERVAL_TIME)
             onConnectionFailed(interval)
         }
 
         /*连接服务器成功事件*/
-        if (intent.action == CIMConstant.IntentAction.ACTION_CONNECTION_SUCCESSED) {
-            onInnerConnectionSuccessed()
+        if (intent.action == IMConstant.IntentAction.ACTION_CONNECTION_SUCCESS) {
+            onInnerConnectionSuccess()
         }
 
         /*收到推送消息事件*/
-        if (intent.action == CIMConstant.IntentAction.ACTION_MESSAGE_RECEIVED) {
+        if (intent.action == IMConstant.IntentAction.ACTION_MESSAGE_RECEIVED) {
             onInnerMessageReceived(
                 intent.getSerializableExtra(Message::class.java.name) as Message,
                 intent
@@ -60,24 +61,24 @@ abstract class CIMEventBroadcastReceiver : BroadcastReceiver() {
         }
 
         /*获取收到 ReplyBody 成功事件*/
-        if (intent.action == CIMConstant.IntentAction.ACTION_REPLY_RECEIVED) {
+        if (intent.action == IMConstant.IntentAction.ACTION_REPLY_RECEIVED) {
             onReplyReceived(intent.getSerializableExtra(ReplyBody::class.java.name) as ReplyBody)
         }
 
 
-        /*获取 SentBody 发送成功事件*/
-        if (intent.action == CIMConstant.IntentAction.ACTION_SENT_SUCCESSED) {
-            onSentSucceed(intent.getSerializableExtra(SentBody::class.java.name) as SentBody)
+        /*获取 SendBody 发送成功事件*/
+        if (intent.action == IMConstant.IntentAction.ACTION_SENT_SUCCESS) {
+            onSentSucceed(intent.getSerializableExtra(SendBody::class.java.name) as SendBody)
         }
 
         /*重新连接，如果断开的话*/
-        if (intent.action == CIMConstant.IntentAction.ACTION_CONNECTION_RECOVERY) {
+        if (intent.action == IMConstant.IntentAction.ACTION_CONNECTION_RECOVERY) {
             connect(0)
         }
     }
 
     private fun startPushService() {
-        val intent = Intent(context, CIMPushService::class.java)
+        val intent = Intent(context, IMPushService::class.java)
         intent.action = CIMPushManager.ACTION_ACTIVATE_PUSH_SERVICE
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             context.startForegroundService(intent)
@@ -94,14 +95,14 @@ abstract class CIMEventBroadcastReceiver : BroadcastReceiver() {
         onConnectionClosed()
     }
 
-    private fun onConnectionFailed(reinterval: Long) {
+    private fun onConnectionFailed(reInterval: Long) {
         if (CIMPushManager.isNetworkConnected(context)) {
             onConnectionFailed()
-            connect(reinterval)
+            connect(reInterval)
         }
     }
 
-    private fun onInnerConnectionSuccessed() {
+    private fun onInnerConnectionSuccess() {
         CIMCacheManager.putBoolean(context, CIMCacheManager.KEY_CIM_CONNECTION_STATE, true)
         val autoBind = CIMPushManager.autoBindAccount(context)
         onConnectionSuccessed(autoBind)
@@ -115,8 +116,8 @@ abstract class CIMEventBroadcastReceiver : BroadcastReceiver() {
     }
 
     private fun connect(delay: Long) {
-        val serviceIntent = Intent(context, CIMPushService::class.java)
-        serviceIntent.putExtra(CIMPushService.KEY_DELAYED_TIME, delay)
+        val serviceIntent = Intent(context, IMPushService::class.java)
+        serviceIntent.putExtra(IMPushService.KEY_DELAYED_TIME, delay)
         serviceIntent.action = CIMPushManager.ACTION_CREATE_CIM_CONNECTION
         CIMPushManager.startService(context, serviceIntent)
     }
@@ -128,33 +129,33 @@ abstract class CIMEventBroadcastReceiver : BroadcastReceiver() {
         onMessageReceived(message, intent)
     }
 
-    private fun isForceOfflineMessage(action: String): Boolean {
-        return CIMConstant.MessageAction.ACTION_999 == action
+    private fun isForceOfflineMessage(action: String?): Boolean {
+        return IMConstant.MessageAction.ACTION_999 == action
     }
 
     abstract fun onMessageReceived(message: Message, intent: Intent)
 
     fun onNetworkChanged() {
-        CIMListenerManager.notifyOnNetworkChanged(CIMPushManager.getNetworkInfo(context)!!)
+        IMListenerManager.notifyOnNetworkChanged(CIMPushManager.getNetworkInfo(context)!!)
     }
 
     open fun onConnectionSuccessed(hasAutoBind: Boolean) {
-        CIMListenerManager.notifyOnConnectionSuccessed(hasAutoBind)
+        IMListenerManager.notifyOnConnectionSuccess(hasAutoBind)
     }
 
     open fun onConnectionClosed() {
-        CIMListenerManager.notifyOnConnectionClosed()
+        IMListenerManager.notifyOnConnectionClosed()
     }
 
     open fun onConnectionFailed() {
-        CIMListenerManager.notifyOnConnectionFailed()
+        IMListenerManager.notifyOnConnectionFailed()
     }
 
     open fun onReplyReceived(body: ReplyBody) {
-        CIMListenerManager.notifyOnReplyReceived(body)
+        IMListenerManager.notifyOnReplyReceived(body)
     }
 
-    fun onSentSucceed(body: SentBody) {
-        CIMListenerManager.notifyOnSentSucceed(body)
+    fun onSentSucceed(body: SendBody) {
+        IMListenerManager.notifyOnSentSucceed(body)
     }
 }
