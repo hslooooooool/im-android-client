@@ -35,9 +35,8 @@ abstract class CIMMonitorActivity : Activity(), CIMEventListener {
 
     override fun onConnectionFailed() {}
 
-    override fun getEventDispatchOrder(): Int {
-        return 0
-    }
+    override val eventDispatchOrder: Int
+        get() = 0
 
     override fun onConnectionSuccessed(arg0: Boolean) {}
 

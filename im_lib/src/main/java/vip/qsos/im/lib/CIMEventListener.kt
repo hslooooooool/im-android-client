@@ -42,7 +42,7 @@ interface CIMEventListener {
      *
      * @param networkinfo
      */
-    fun onNetworkChanged(networkinfo: NetworkInfo)
+    fun onNetworkChanged(networkinfo: NetworkInfo?)
 
     /**
      * 当连接服务器成功时回调
