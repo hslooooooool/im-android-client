@@ -1,0 +1,2 @@
+include ':app', ':im_lib'
+rootProject.name='im'
