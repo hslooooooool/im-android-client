@@ -17,11 +17,15 @@ import java.util.*
  * IM消息推送服务管理类
  */
 object CIMPushManager {
-
+    /**【动作】开启消息服务日志*/
     const val ACTION_SET_LOGGER_ENABLE = "ACTION_SET_LOGGER_ENABLE"
+    /**【动作】发送消息到服务器*/
     const val ACTION_SEND_REQUEST_BODY = "ACTION_SEND_REQUEST_BODY"
+    /**【动作】关闭服务器连接*/
     const val ACTION_CLOSE_CONNECTION = "ACTION_CLOSE_CONNECTION"
+    /**【动作】连接消息服务器*/
     const val ACTION_CREATE_CONNECTION = "ACTION_CREATE_CONNECTION"
+    /**【动作】消息服务器活跃检测，死掉将重连*/
     const val ACTION_ACTIVATE_PUSH_SERVICE = "ACTION_ACTIVATE_PUSH_SERVICE"
 
     const val KEY_SEND_BODY = "KEY_SEND_BODY"
@@ -39,20 +43,20 @@ object CIMPushManager {
             LogUtils.logger.invalidHostPort(host, port)
             return
         }
-        CIMCacheManager.putString(context, CIMCacheManager.KEY_IM_SERVER_HOST, host)
-        CIMCacheManager.putInt(context, CIMCacheManager.KEY_IM_SERVER_PORT, port)
-        CIMCacheManager.putBoolean(context, CIMCacheManager.KEY_IM_DESTROYED, false)
-        CIMCacheManager.putBoolean(context, CIMCacheManager.KEY_MANUAL_STOP, false)
-        CIMCacheManager.remove(context, CIMCacheManager.KEY_ACCOUNT)
+        IMCacheHelper.putString(context, IMCacheHelper.KEY_IM_SERVER_HOST, host)
+        IMCacheHelper.putInt(context, IMCacheHelper.KEY_IM_SERVER_PORT, port)
+        IMCacheHelper.putBoolean(context, IMCacheHelper.KEY_IM_DESTROYED, false)
+        IMCacheHelper.putBoolean(context, IMCacheHelper.KEY_MANUAL_STOP, false)
+        IMCacheHelper.remove(context, IMCacheHelper.KEY_ACCOUNT)
 
-        val serviceIntent = Intent(context.applicationContext, IMPushService::class.java)
+        val serviceIntent = Intent(context.applicationContext, IMService::class.java)
         serviceIntent.action = ACTION_CREATE_CONNECTION
         startService(context, serviceIntent)
     }
 
     fun setLoggerEnable(context: Context, enable: Boolean) {
-        val serviceIntent = Intent(context.applicationContext, IMPushService::class.java)
-        serviceIntent.putExtra(IMPushService.KEY_LOGGER_ENABLE, enable)
+        val serviceIntent = Intent(context.applicationContext, IMService::class.java)
+        serviceIntent.putExtra(IMService.KEY_LOGGER_ENABLE, enable)
         serviceIntent.action = ACTION_SET_LOGGER_ENABLE
         startService(context, serviceIntent)
     }
@@ -70,13 +74,13 @@ object CIMPushManager {
     }
 
     private fun sendBindRequest(context: Context, account: String) {
-        CIMCacheManager.putBoolean(context, CIMCacheManager.KEY_MANUAL_STOP, false)
-        CIMCacheManager.putString(context, CIMCacheManager.KEY_ACCOUNT, account)
-        var deviceId = CIMCacheManager.getString(context, CIMCacheManager.KEY_DEVICE_ID)
+        IMCacheHelper.putBoolean(context, IMCacheHelper.KEY_MANUAL_STOP, false)
+        IMCacheHelper.putString(context, IMCacheHelper.KEY_ACCOUNT, account)
+        var deviceId = IMCacheHelper.getString(context, IMCacheHelper.KEY_DEVICE_ID)
         if (TextUtils.isEmpty(deviceId)) {
             deviceId =
                 UUID.randomUUID().toString().replace("-".toRegex(), "").toUpperCase(Locale.ENGLISH)
-            CIMCacheManager.putString(context, CIMCacheManager.KEY_DEVICE_ID, deviceId)
+            IMCacheHelper.putString(context, IMCacheHelper.KEY_DEVICE_ID, deviceId)
         }
         val sent = SendBody()
         sent.key = IMConstant.RequestKey.CLIENT_BIND
@@ -91,7 +95,7 @@ object CIMPushManager {
     }
 
     fun autoBindAccount(context: Context): Boolean {
-        val account = CIMCacheManager.getString(context, CIMCacheManager.KEY_ACCOUNT)
+        val account = IMCacheHelper.getString(context, IMCacheHelper.KEY_ACCOUNT)
         if (TextUtils.isEmpty(account) || isDestroyed(context)) {
             return false
         }
@@ -109,7 +113,7 @@ object CIMPushManager {
         if (isDestroyed(context) || isStop(context)) {
             return
         }
-        val serviceIntent = Intent(context.applicationContext, IMPushService::class.java)
+        val serviceIntent = Intent(context.applicationContext, IMService::class.java)
         serviceIntent.putExtra(KEY_SEND_BODY, body)
         serviceIntent.action = ACTION_SEND_REQUEST_BODY
         startService(context, serviceIntent)
@@ -120,17 +124,17 @@ object CIMPushManager {
         if (isDestroyed(context)) {
             return
         }
-        CIMCacheManager.putBoolean(context, CIMCacheManager.KEY_MANUAL_STOP, true)
-        val serviceIntent = Intent(context.applicationContext, IMPushService::class.java)
+        IMCacheHelper.putBoolean(context, IMCacheHelper.KEY_MANUAL_STOP, true)
+        val serviceIntent = Intent(context.applicationContext, IMService::class.java)
         serviceIntent.action = ACTION_CLOSE_CONNECTION
         startService(context, serviceIntent)
     }
 
     /**完全销毁消息服务，一般用于完全退出程序，调用 resume 将不能恢复*/
     fun destroy(context: Context) {
-        CIMCacheManager.putBoolean(context, CIMCacheManager.KEY_IM_DESTROYED, true)
-        CIMCacheManager.putString(context, CIMCacheManager.KEY_ACCOUNT, null)
-        context.stopService(Intent(context.applicationContext, IMPushService::class.java))
+        IMCacheHelper.putBoolean(context, IMCacheHelper.KEY_IM_DESTROYED, true)
+        IMCacheHelper.putString(context, IMCacheHelper.KEY_ACCOUNT, null)
+        context.stopService(Intent(context.applicationContext, IMService::class.java))
     }
 
     /**重新恢复接收推送，重新连接服务端，登录缓存的账号*/
@@ -143,17 +147,17 @@ object CIMPushManager {
 
     /**判断服务已销毁*/
     fun isDestroyed(context: Context): Boolean {
-        return CIMCacheManager.getBoolean(context, CIMCacheManager.KEY_IM_DESTROYED)
+        return IMCacheHelper.getBoolean(context, IMCacheHelper.KEY_IM_DESTROYED)
     }
 
     /**判断消息服务已停止*/
     fun isStop(context: Context): Boolean {
-        return CIMCacheManager.getBoolean(context, CIMCacheManager.KEY_MANUAL_STOP)
+        return IMCacheHelper.getBoolean(context, IMCacheHelper.KEY_MANUAL_STOP)
     }
 
     /**判断消息服务已连接*/
     fun isConnected(context: Context): Boolean {
-        return CIMCacheManager.getBoolean(context, CIMCacheManager.KEY_CIM_CONNECTION_STATE)
+        return IMCacheHelper.getBoolean(context, IMCacheHelper.KEY_CIM_CONNECTION_STATE)
     }
 
     /**判断网络已连接*/

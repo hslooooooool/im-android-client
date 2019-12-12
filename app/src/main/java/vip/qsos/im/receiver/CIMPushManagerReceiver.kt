@@ -11,7 +11,7 @@ import android.net.NetworkInfo
 import androidx.core.app.NotificationCompat
 import com.farsunset.ichat.example.R
 
-import vip.qsos.im.lib.CIMEventBroadcastReceiver
+import vip.qsos.im.lib.AbsIMEventBroadcastReceiver
 import vip.qsos.im.lib.IMListenerManager
 import vip.qsos.im.lib.model.Message
 import vip.qsos.im.lib.model.ReplyBody
@@ -21,7 +21,7 @@ import vip.qsos.im.ui.MessageActivity
  * @author : 华清松
  * 消息接收广播服务
  */
-class CIMPushManagerReceiver : CIMEventBroadcastReceiver() {
+class CIMPushManagerReceiver : AbsIMEventBroadcastReceiver() {
 
     override fun onMessageReceived(message: Message, intent: Intent) {
         //调用分发消息监听

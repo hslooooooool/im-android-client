@@ -6,6 +6,13 @@ package vip.qsos.im.lib.constant
  */
 interface IMConstant {
 
+    companion object {
+        /**【定义】消息服务重连时长，毫秒*/
+        var RECONNECT_INTERVAL_TIME: Long = 30 * 1000L
+        /**【定义】消息头长度3个字节，第一个字节为消息类型，第二、三字节转换 int 后为消息长度*/
+        const val DATA_HEADER_LENGTH: Int = 3
+    }
+
     interface ReturnCode {
         companion object {
             const val CODE_404 = "404"
@@ -68,13 +75,6 @@ interface IMConstant {
             // 重试连接
             const val ACTION_CONNECTION_RECOVERY = "ACTION_CONNECTION_RECOVERY"
         }
-    }
-
-    companion object {
-        /**消息服务重连时长，毫秒*/
-        const val RECONNECT_INTERVAL_TIME: Long = 30 * 1000L
-        /**【定义】消息头长度3个字节，第一个字节为消息类型，第二、三字节转换 int 后为消息长度*/
-        const val DATA_HEADER_LENGTH: Int = 3
     }
 
 }

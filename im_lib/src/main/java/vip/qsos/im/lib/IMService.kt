@@ -4,24 +4,33 @@ import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.Service
-import android.content.*
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.net.ConnectivityManager
 import android.net.Network
 import android.os.Build
 import android.os.Handler
 import android.os.IBinder
 import android.text.TextUtils
-import android.util.Log
 import vip.qsos.im.lib.coder.LogUtils
 import vip.qsos.im.lib.constant.IMConstant
 import vip.qsos.im.lib.model.SendBody
 
 /**
  * @author : 华清松
- * 消息服务连接服务
+ * 消息服务
  */
-class IMPushService : Service() {
-    private var mConnectManager: IMConnectManager? = null
+class IMService : Service() {
+
+    companion object {
+        private const val NOTIFICATION_ID = Integer.MAX_VALUE
+        const val KEY_DELAYED_TIME = "KEY_DELAYED_TIME"
+        const val KEY_LOGGER_ENABLE = "KEY_LOGGER_ENABLE"
+    }
+
+    private lateinit var mConnectManager: IMConnectManager
     private var mKeepAliveReceiver: KeepAliveBroadcastReceiver? = null
     private var mConnectivityManager: ConnectivityManager? = null
 
@@ -43,20 +52,18 @@ class IMPushService : Service() {
             }
         }
 
+    /**服务连接*/
     private var mConnectHandler: Handler = Handler {
-        connect()
+        this.connect()
         true
     }
 
+    /**消息通知*/
     private var mNotificationHandler: Handler = Handler {
         stopForeground(true)
         true
     }
 
-    override fun startForegroundService(service: Intent?): ComponentName? {
-
-        return super.startForegroundService(service)
-    }
     override fun onCreate() {
         mConnectManager = IMConnectManager.getManager(this.applicationContext)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -64,6 +71,7 @@ class IMPushService : Service() {
             registerReceiver(mKeepAliveReceiver, mKeepAliveReceiver!!.intentFilter)
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            /**安卓版本大于N时，可以注册网络监控，在网络变化时采取一些策略*/
             mConnectivityManager =
                 getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
             mConnectivityManager!!.registerDefaultNetworkCallback(networkCallback)
@@ -71,7 +79,6 @@ class IMPushService : Service() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        var mIntent = intent
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             /**开启前台服务*/
             val notificationManager =
@@ -91,20 +98,19 @@ class IMPushService : Service() {
                 .build()
             startForeground(NOTIFICATION_ID, notification)
         }
-
-        mIntent = mIntent ?: Intent(CIMPushManager.ACTION_ACTIVATE_PUSH_SERVICE)
+        val mIntent: Intent = intent ?: Intent(CIMPushManager.ACTION_ACTIVATE_PUSH_SERVICE)
         when (mIntent.action) {
             CIMPushManager.ACTION_CREATE_CONNECTION -> {
-                connect(mIntent.getLongExtra(KEY_DELAYED_TIME, 0))
+                this.delayConnect(mIntent.getLongExtra(KEY_DELAYED_TIME, 0))
             }
             CIMPushManager.ACTION_SEND_REQUEST_BODY -> {
-                mConnectManager!!.send(mIntent.getSerializableExtra(CIMPushManager.KEY_SEND_BODY) as SendBody)
+                mConnectManager.send(mIntent.getSerializableExtra(CIMPushManager.KEY_SEND_BODY) as SendBody)
             }
             CIMPushManager.ACTION_CLOSE_CONNECTION -> {
-                mConnectManager!!.closeSession()
+                mConnectManager.closeConnect()
             }
             CIMPushManager.ACTION_ACTIVATE_PUSH_SERVICE -> {
-                handleKeepAlive()
+                this.handleKeepAlive()
             }
             CIMPushManager.ACTION_SET_LOGGER_ENABLE -> {
                 val enable = mIntent.getBooleanExtra(KEY_LOGGER_ENABLE, true)
@@ -112,58 +118,59 @@ class IMPushService : Service() {
             }
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            /**延迟【1】秒后关闭通知栏通知*/
             mNotificationHandler.sendEmptyMessageDelayed(0, 1000)
         }
         return super.onStartCommand(mIntent, flags, startId)
     }
 
-    private fun connect(delayMillis: Long) {
+    /**延迟连接服务器
+     * @param delayMillis 延迟毫秒数
+     * */
+    private fun delayConnect(delayMillis: Long) {
         if (delayMillis <= 0) {
-            connect()
-            return
+            this.connect()
+        } else {
+            mConnectHandler.sendEmptyMessageDelayed(0, delayMillis)
         }
-        mConnectHandler.sendEmptyMessageDelayed(0, delayMillis)
     }
 
     /**连接消息服务器*/
     private fun connect() {
         if (CIMPushManager.isDestroyed(this) || CIMPushManager.isStop(this)) {
+            LogUtils.logger.connectState(false)
             return
         }
-        val host = CIMCacheManager.getString(this, CIMCacheManager.KEY_IM_SERVER_HOST)
-        val port = CIMCacheManager.getInt(this, CIMCacheManager.KEY_IM_SERVER_PORT)
+        val host = IMCacheHelper.getString(this, IMCacheHelper.KEY_IM_SERVER_HOST)
+        val port = IMCacheHelper.getInt(this, IMCacheHelper.KEY_IM_SERVER_PORT)
         if (TextUtils.isEmpty(host) || port <= 0) {
-            Log.e(this.javaClass.simpleName, "Invalid host or port. host:$host port:$port")
-            return
+            LogUtils.logger.invalidHostPort(host, port)
+        } else {
+            mConnectManager.connect(host!!, port)
         }
-        mConnectManager!!.connect(host!!, port)
     }
 
+    /**捕获到保活请求，判断一次服务连接情况，未连接时发起连接*/
     private fun handleKeepAlive() {
-        if (mConnectManager!!.isConnected) {
-            LogUtils.logger.connectState(true)
-            return
+        if (!mConnectManager.isConnected) {
+            this.connect()
         }
-        connect()
     }
 
-    override fun onBind(arg0: Intent): IBinder? {
+    override fun onBind(intent: Intent?): IBinder? {
         return null
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        mConnectManager!!.destroy()
+        mConnectManager.destroy()
         mConnectHandler.removeMessages(0)
         mNotificationHandler.removeMessages(0)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            unregisterReceiver(mKeepAliveReceiver)
-        }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            mConnectivityManager!!.unregisterNetworkCallback(networkCallback)
-        }
+        mKeepAliveReceiver?.let { unregisterReceiver(mKeepAliveReceiver) }
+        mConnectivityManager?.unregisterNetworkCallback(networkCallback)
     }
 
+    /**创建一个观察手机自身状态的广播接收器，以此保活消息服务*/
     inner class KeepAliveBroadcastReceiver : BroadcastReceiver() {
         val intentFilter: IntentFilter
             get() {
@@ -174,15 +181,8 @@ class IMPushService : Service() {
                 return intentFilter
             }
 
-        override fun onReceive(arg0: Context, arg1: Intent) {
+        override fun onReceive(context: Context, intent: Intent) {
             handleKeepAlive()
         }
     }
-
-    companion object {
-        private const val NOTIFICATION_ID = Integer.MAX_VALUE
-        const val KEY_DELAYED_TIME = "KEY_DELAYED_TIME"
-        const val KEY_LOGGER_ENABLE = "KEY_LOGGER_ENABLE"
-    }
-
 }

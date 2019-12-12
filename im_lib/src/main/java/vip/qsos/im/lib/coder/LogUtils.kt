@@ -25,105 +25,122 @@ class LogUtils private constructor() {
         debug = mode
     }
 
-    fun messageReceived(session: SocketChannel, message: Any) {
+    /**打印接收到的数据*/
+    fun received(session: SocketChannel, message: Any) {
         if (debug) {
-            Log.i(TAG, String.format("[RECEIVED]" + getSessionInfo(session) + "\n%s", message))
+            Log.i(TAG, String.format("[RECEIVED]" + getChannelInfo(session) + "\n%s", message))
         }
     }
 
-    fun messageSentSuccess(session: SocketChannel, message: Any) {
-        if (debug) {
-            Log.i(TAG, String.format("[  SENT  ]" + getSessionInfo(session) + "\n%s", message))
-        }
-    }
-
-    fun messageSentFailed(session: SocketChannel, message: Any) {
+    /**打印发送成功的消息*/
+    fun sendSuccess(session: SocketChannel, message: Any) {
         if (debug) {
             Log.i(
                 TAG,
-                String.format("[  SENT FAILED  ]" + getSessionInfo(session) + "\n%s", message)
+                String.format("[  SEND SUCCESS  ]" + getChannelInfo(session) + "\n%s", message)
             )
         }
     }
 
-    fun messageSentException(e: Exception) {
+    /**打印发送失败的消息*/
+    fun sendFailed(session: SocketChannel, message: Any) {
         if (debug) {
-            Log.i(TAG, "[  SENT EXCEPTION  ] ${e.message}")
+            Log.i(
+                TAG,
+                String.format("[  SEND FAILED  ]" + getChannelInfo(session) + "\n%s", message)
+            )
         }
     }
 
-    fun sessionCreated(session: SocketChannel) {
+    /**打印发送失败的异常*/
+    fun sendException(e: Exception) {
         if (debug) {
-            Log.i(TAG, "[ OPENED ]" + getSessionInfo(session))
+            Log.i(TAG, "[  SEND EXCEPTION  ] ${e.message}")
         }
     }
 
-    fun sessionIdle(session: SocketChannel) {
+    /**打印 POST 和 PORT 配置*/
+    fun connectStart(host: String, port: Int) {
         if (debug) {
-            Log.d(TAG, "[  IDLE  ]" + getSessionInfo(session))
+            Log.i(TAG, "CONNECT REMOTE HOST:$host PORT:$port")
         }
     }
 
-    fun sessionClosed(session: SocketChannel) {
+    /**打印无效的 POST 和 PORT 配置*/
+    fun invalidHostPort(host: String?, port: Int) {
         if (debug) {
-            Log.w(TAG, "[ CLOSED ] ID = " + session.hashCode())
+            Log.d(TAG, "INVALID SOCKET ADDRESS -> HOST:$host PORT:$port")
         }
     }
 
-    fun connectFailure(interval: Long) {
+    /**打印当前连接的通道信息*/
+    fun connectCreated(channel: SocketChannel) {
+        if (debug) {
+            Log.i(TAG, "[ OPENED ]" + getChannelInfo(channel))
+        }
+    }
+
+    /**打印当前连接的通道信息与消息读取线程闲置时长*/
+    fun connectReadIdle(channel: SocketChannel, idle: Long) {
+        if (debug) {
+            Log.d(TAG, "[  READ IDLE  ]" + getChannelInfo(channel) + " HAS IDLE $idle ms")
+        }
+    }
+
+    /**打印链接关闭并释放资源*/
+    fun connectClosed(channel: SocketChannel) {
+        if (debug) {
+            Log.w(TAG, "[ CLOSED ] ID = " + channel.hashCode())
+        }
+    }
+
+    /**打印连接失败信息与重试计时毫秒数*/
+    fun connectFailed(interval: Long) {
         if (debug) {
             Log.d(TAG, "CONNECT FAILURE, TRY RECONNECT AFTER " + interval + "ms")
         }
     }
 
-    fun startConnect(host: String, port: Int) {
-        if (debug) {
-            Log.i(TAG, "START CONNECT REMOTE HOST:$host PORT:$port")
-        }
-    }
-
+    /**打印网络状态*/
     fun networkState(connect: Boolean) {
         if (debug) {
             Log.i(TAG, "NETWORK IS OK = $connect")
         }
     }
 
-    fun invalidHostPort(host: String, port: Int) {
+    /**打印连接状态*/
+    fun connectState(connected: Boolean) {
         if (debug) {
-            Log.d(TAG, "INVALID SOCKET ADDRESS -> HOST:$host PORT:$port")
+            Log.d(TAG, "CONNECTED:$connected")
         }
     }
 
-    fun connectState(isConnected: Boolean) {
+    /**打印连接状态*/
+    fun connectState(connected: Boolean, manualStop: Boolean, destroyed: Boolean) {
         if (debug) {
-            Log.d(TAG, "CONNECTED:$isConnected")
+            Log.d(TAG, "CONNECTED:$connected MANUAL STOP:$manualStop DESTROYED:$destroyed")
         }
     }
 
-    fun connectState(isConnected: Boolean, isManualStop: Boolean, isDestroyed: Boolean) {
-        if (debug) {
-            Log.d(TAG, "CONNECTED:$isConnected STOPED:$isManualStop DESTROYED:$isDestroyed")
-        }
-    }
-
-    private fun getSessionInfo(session: SocketChannel?): String {
+    /**获取当前连接的通道信息*/
+    private fun getChannelInfo(channel: SocketChannel?): String {
         val builder = StringBuilder()
-        if (session == null) {
+        if (channel == null) {
             return ""
         }
         builder.append(" [")
-        builder.append("id:").append(session.hashCode())
+        builder.append("id:").append(channel.hashCode())
         try {
-            if (session.socket().localAddress != null) {
+            if (channel.socket().localAddress != null) {
                 builder.append(" L:")
-                    .append(session.socket().localAddress.toString() + ":" + session.socket().localPort)
+                    .append(channel.socket().localAddress.toString() + ":" + channel.socket().localPort)
             }
         } catch (ignore: Exception) {
         }
 
         try {
-            if (session.socket().remoteSocketAddress != null) {
-                builder.append(" R:").append(session.socket().remoteSocketAddress.toString())
+            if (channel.socket().remoteSocketAddress != null) {
+                builder.append(" R:").append(channel.socket().remoteSocketAddress.toString())
             }
         } catch (ignore: Exception) {
         }

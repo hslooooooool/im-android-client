@@ -17,7 +17,7 @@ import java.net.InetSocketAddress
 import java.net.SocketTimeoutException
 import java.nio.ByteBuffer
 import java.nio.channels.SocketChannel
-import java.util.*
+import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import java.util.concurrent.Semaphore
 import java.util.concurrent.atomic.AtomicLong
@@ -27,23 +27,27 @@ import java.util.concurrent.atomic.AtomicLong
  * 服务端连接管理与消息处理
  */
 @SuppressLint("StaticFieldLeak")
-class IMConnectManager private constructor(val context: Context) {
+class IMConnectManager private constructor(override val mContext: Context) : IConnectManager {
 
     companion object {
         const val READ_BUFFER_SIZE = 2048
         const val WRITE_BUFFER_SIZE = 1024
-        const val READ_IDLE_TIME = 120 * 1000
-        /**链接超时时长，毫秒*/
+        /**消息读取间隔时长，毫秒。
+         * 应比链接活跃时长小，以保证重连功能的正确性，读取线程将闲置【120】秒，超过后将发起手动断开连接请求
+         * @see CONNECT_ALIVE_TIME_OUT
+         * */
+        const val CONNECT_READ_IDLE_TIME = 120 * 1000L
+        /**连接服务器的超时时长，毫秒*/
         const val CONNECT_TIME_OUT = 10 * 1000
-        /**链接活跃时长，毫秒*/
+        /**连接活跃时长，毫秒*/
         const val CONNECT_ALIVE_TIME_OUT = 150 * 1000
 
-        /**启动一个闲置线程，用于维护消息 Handler 发送*/
-        private val IDLE_HANDLER_THREAD =
-            HandlerThread("READ-IDLE", Process.THREAD_PRIORITY_BACKGROUND)
+        /**消息读取闲置管理线程，当消息读取闲置时间一到，将主动断开连接，保证下一次重连成功*/
+        private val CONNECT_READ_IDLE_THREAD =
+            HandlerThread("SocketReadIdle-", Process.THREAD_PRIORITY_BACKGROUND)
 
         init {
-            IDLE_HANDLER_THREAD.start()
+            CONNECT_READ_IDLE_THREAD.start()
         }
 
         @Volatile
@@ -57,53 +61,36 @@ class IMConnectManager private constructor(val context: Context) {
         }
     }
 
-    /**最近读取时间*/
-    private val mLastReadTime = AtomicLong(0)
-    /**消息服务连接并发控制*/
-    private val mSemaphore = Semaphore(1, true)
-    /**消息通道*/
-    private var mSocketChannel: SocketChannel? = null
-    /**消息发送编码*/
-    private val mMessageEncoder = ClientMessageEncoder()
-    /**消息接收编码*/
-    private val mMessageDecoder = ClientMessageDecoder()
-
-    /**消息读取暂存*/
-    private var mReadBuffer = ByteBuffer.allocate(READ_BUFFER_SIZE)
-
-    /**消息服务发送线程*/
-    private val mSocketSendExecutor = Executors.newFixedThreadPool(1) { r ->
+    override val mLastReadTime = AtomicLong(0)
+    override val mSemaphore = Semaphore(1, true)
+    override var mSocketChannel: SocketChannel? = null
+    override val mMessageEncoder: ClientMessageEncoder = ClientMessageEncoder()
+    override val mMessageDecoder: ClientMessageDecoder = ClientMessageDecoder()
+    override var mReadBuffer: ByteBuffer = ByteBuffer.allocate(READ_BUFFER_SIZE)
+    override val mSocketSendExecutor: ExecutorService = Executors.newFixedThreadPool(1) { r ->
         Thread(r, "SocketSend-")
     }
-    /**消息服务连接线程*/
-    private val mSocketConnectExecutor = Executors.newFixedThreadPool(1) { r ->
+    override val mSocketConnectExecutor: ExecutorService = Executors.newFixedThreadPool(1) { r ->
         Thread(r, "SocketConnect-")
     }
-
-    /**消息服务是否已连接*/
-    var isConnected: Boolean = false
+    override var isConnected: Boolean = false
         get() {
             field = mSocketChannel != null && mSocketChannel!!.isConnected
-            LogUtils.logger.networkState(field)
+            LogUtils.logger.connectState(field)
             return field
         }
 
-    /**消息会话生命周期控制*/
-    private val mSessionIdleHandler = Handler(IDLE_HANDLER_THREAD.looper) {
-        sessionIdle()
+    override val mConnectCloseHandler = Handler(CONNECT_READ_IDLE_THREAD.looper) {
+        checkAndCloseConnect()
         true
     }
 
-    private val heartbeatResponse: HeartbeatResponse
-        get() = HeartbeatResponse.instance
-
-    /**连接消息服务器*/
-    fun connect(host: String, port: Int) {
-        if (!CIMPushManager.isNetworkConnected(context)) {
+    override fun connect(host: String, port: Int) {
+        if (!CIMPushManager.isNetworkConnected(mContext)) {
             val intent = Intent()
-            intent.setPackage(context.packageName)
+            intent.setPackage(mContext.packageName)
             intent.action = IMConstant.IntentAction.ACTION_CONNECTION_FAILED
-            context.sendBroadcast(intent)
+            mContext.sendBroadcast(intent)
             return
         }
         if (isConnected) {
@@ -113,9 +100,9 @@ class IMConnectManager private constructor(val context: Context) {
             if (isConnected) {
                 return@Runnable
             }
-            LogUtils.logger.startConnect(host, port)
+            LogUtils.logger.connectStart(host, port)
 
-            CIMCacheManager.putBoolean(context, CIMCacheManager.KEY_CIM_CONNECTION_STATE, false)
+            IMCacheHelper.putBoolean(mContext, IMCacheHelper.KEY_CIM_CONNECTION_STATE, false)
             mSemaphore.acquire()
             try {
                 mSocketChannel = SocketChannel.open()
@@ -125,28 +112,30 @@ class IMConnectManager private constructor(val context: Context) {
                 mSocketChannel!!.socket().receiveBufferSize = READ_BUFFER_SIZE
                 mSocketChannel!!.socket().sendBufferSize = WRITE_BUFFER_SIZE
                 mSocketChannel!!.socket().connect(InetSocketAddress(host, port), CONNECT_TIME_OUT)
+                mSemaphore.release()
 
-                handelConnectedEvent()
+                this.channelCreated()
 
                 var result = 1
                 /**链接成功，开启循环，读取通道传递的数据*/
                 while (result > 0) {
+                    /**下方代码将在Socket传递消息时主动读取一次*/
                     result = mSocketChannel!!.read(mReadBuffer)
                     if (result > 0) {
                         if (mReadBuffer.position() == mReadBuffer.capacity()) {
                             mReadBuffer = extendByteBuffer(mReadBuffer)
                         }
-                        handelSocketReadEvent(result)
+                        this.handelSocketReadEvent(result)
                     }
                 }
                 /**链接失败，无数据*/
-                handelSocketReadEvent(result)
+                this.handelSocketReadEvent(result)
             } catch (ignore: ConnectException) {
-                handleConnectAbortedEvent()
+                this.handleConnectTimeoutEvent()
             } catch (ignore: SocketTimeoutException) {
-                handleConnectAbortedEvent()
+                this.handleConnectTimeoutEvent()
             } catch (ignore: IOException) {
-                handelDisconnectedEvent()
+                this.handelDisconnectedEvent()
             } catch (e: Exception) {
                 e.printStackTrace()
             } finally {
@@ -155,26 +144,22 @@ class IMConnectManager private constructor(val context: Context) {
         })
     }
 
-    /**销毁消息会话*/
-    fun destroy() {
-        closeSession()
+    override fun destroy() {
+        closeConnect()
     }
 
-    /**关闭消息会话*/
-    fun closeSession() {
-        if (!isConnected) {
-            return
-        }
-        try {
-            mSocketChannel!!.close()
-        } catch (ignore: IOException) {
-        } finally {
-            this.sessionClosed()
+    override fun closeConnect() {
+        if (isConnected) {
+            try {
+                mSocketChannel?.close()
+            } catch (ignore: IOException) {
+            } finally {
+                this.clearAll()
+            }
         }
     }
 
-    /**客户端发送消息*/
-    fun send(body: IProtobufAble) {
+    override fun send(body: IProtobufAble) {
         if (!isConnected) {
             return
         }
@@ -191,12 +176,12 @@ class IMConnectManager private constructor(val context: Context) {
                     result += mSocketChannel!!.write(buffer)
                 }
             } catch (e: Exception) {
-                LogUtils.logger.messageSentException(e)
+                LogUtils.logger.sendException(e)
                 result = -1
             } finally {
                 mSemaphore.release()
                 if (result <= 0) {
-                    closeSession()
+                    closeConnect()
                 } else {
                     messageSentSuccess(body)
                 }
@@ -204,123 +189,115 @@ class IMConnectManager private constructor(val context: Context) {
         })
     }
 
-    private fun sessionCreated() {
-        LogUtils.logger.sessionCreated(mSocketChannel!!)
-
+    override fun channelCreated() {
+        LogUtils.logger.connectCreated(mSocketChannel!!)
         mLastReadTime.set(System.currentTimeMillis())
+        mConnectCloseHandler.sendEmptyMessageDelayed(0, CONNECT_READ_IDLE_TIME)
         val intent = Intent()
-        intent.setPackage(context.packageName)
+        intent.setPackage(mContext.packageName)
         intent.action = IMConstant.IntentAction.ACTION_CONNECTION_SUCCESS
-        context.sendBroadcast(intent)
+        mContext.sendBroadcast(intent)
     }
 
-    /**关闭会话*/
-    private fun sessionClosed() {
-        mSessionIdleHandler.removeMessages(0)
+    override fun clearAll() {
+        LogUtils.logger.connectClosed(mSocketChannel!!)
+        mConnectCloseHandler.removeMessages(0)
         mLastReadTime.set(0)
-        LogUtils.logger.sessionClosed(mSocketChannel!!)
         mReadBuffer.clear()
+        mSemaphore.release()
         if (mReadBuffer.capacity() > READ_BUFFER_SIZE) {
             mReadBuffer = ByteBuffer.allocate(READ_BUFFER_SIZE)
         }
         val intent = Intent()
-        intent.setPackage(context.packageName)
+        intent.setPackage(mContext.packageName)
         intent.action = IMConstant.IntentAction.ACTION_CONNECTION_CLOSED
-        context.sendBroadcast(intent)
+        mContext.sendBroadcast(intent)
     }
 
-    /**会话生命周期判断*/
-    private fun sessionIdle() {
-        LogUtils.logger.sessionIdle(mSocketChannel!!)
-        /*用于解决，wifi情况下。偶而路由器与服务器断开连接时，客户端并没及时收到关闭事件，导致这样的情况下当前连接无效也不会重连的问题*/
-        if (System.currentTimeMillis() - mLastReadTime.get() >= CONNECT_ALIVE_TIME_OUT) {
-            closeSession()
+    override fun checkAndCloseConnect() {
+        val idle = System.currentTimeMillis() - mLastReadTime.get()
+        LogUtils.logger.connectReadIdle(mSocketChannel!!, idle)
+        if (idle >= CONNECT_ALIVE_TIME_OUT) {
+            /**当前时间距离最近一次通信的时间如果大于配置的连接活跃时间，则表明连接可能已断开，
+             * 无论是否连接都应主动断开连接，以保证下次连接时成功*/
+            closeConnect()
         }
     }
 
-    private fun messageReceived(obj: Any) {
-        if (obj is Message) {
-            val intent = Intent()
-            intent.setPackage(context.packageName)
-            intent.action = IMConstant.IntentAction.ACTION_MESSAGE_RECEIVED
-            intent.putExtra(Message::class.java.name, obj)
-            context.sendBroadcast(intent)
-        }
-        if (obj is ReplyBody) {
-            val intent = Intent()
-            intent.setPackage(context.packageName)
-            intent.action = IMConstant.IntentAction.ACTION_REPLY_RECEIVED
-            intent.putExtra(ReplyBody::class.java.name, obj)
-            context.sendBroadcast(intent)
+    override fun messageReceived(message: Any) {
+        LogUtils.logger.received(mSocketChannel!!, message)
+        when (message) {
+            is HeartbeatRequest -> {
+                this.send(HeartbeatResponse.instance)
+            }
+            is Message -> {
+                val intent = Intent()
+                intent.setPackage(mContext.packageName)
+                intent.action = IMConstant.IntentAction.ACTION_MESSAGE_RECEIVED
+                intent.putExtra(Message::class.java.name, message)
+                mContext.sendBroadcast(intent)
+            }
+            is ReplyBody -> {
+                val intent = Intent()
+                intent.setPackage(mContext.packageName)
+                intent.action = IMConstant.IntentAction.ACTION_REPLY_RECEIVED
+                intent.putExtra(ReplyBody::class.java.name, message)
+                mContext.sendBroadcast(intent)
+            }
         }
     }
 
-    private fun messageSentSuccess(message: Any) {
-        LogUtils.logger.messageSentSuccess(mSocketChannel!!, message)
+    override fun messageSentSuccess(message: Any) {
+        LogUtils.logger.sendSuccess(mSocketChannel!!, message)
         if (message is SendBody) {
             val intent = Intent()
-            intent.setPackage(context.packageName)
+            intent.setPackage(mContext.packageName)
             intent.action = IMConstant.IntentAction.ACTION_SENT_SUCCESS
             intent.putExtra(SendBody::class.java.name, message)
-            context.sendBroadcast(intent)
+            mContext.sendBroadcast(intent)
         }
     }
 
-    private fun messageSentFailed(message: Any) {
-        LogUtils.logger.messageSentFailed(mSocketChannel!!, message)
+    override fun messageSentFailed(message: Any) {
+        LogUtils.logger.sendFailed(mSocketChannel!!, message)
         if (message is SendBody) {
             val intent = Intent()
-            intent.setPackage(context.packageName)
+            intent.setPackage(mContext.packageName)
             intent.action = IMConstant.IntentAction.ACTION_SENT_FAILED
             intent.putExtra(SendBody::class.java.name, message)
-            context.sendBroadcast(intent)
+            mContext.sendBroadcast(intent)
         }
     }
 
-    private fun handelDisconnectedEvent() {
-        closeSession()
+    override fun handelDisconnectedEvent() {
+        closeConnect()
     }
 
-    private fun handleConnectAbortedEvent() {
-        val interval =
-            IMConstant.RECONNECT_INTERVAL_TIME - (5 * 1000 - Random().nextInt(15 * 1000))
-        LogUtils.logger.connectFailure(interval)
+    override fun handleConnectTimeoutEvent() {
+        LogUtils.logger.connectFailed(IMConstant.RECONNECT_INTERVAL_TIME)
         val intent = Intent()
-        intent.setPackage(context.packageName)
+        intent.setPackage(mContext.packageName)
         intent.action = IMConstant.IntentAction.ACTION_CONNECTION_FAILED
-        intent.putExtra("interval", interval)
-        context.sendBroadcast(intent)
+        mContext.sendBroadcast(intent)
     }
 
-    private fun handelConnectedEvent() {
-        this.sessionCreated()
-        mSessionIdleHandler.sendEmptyMessageDelayed(0, READ_IDLE_TIME.toLong())
-    }
-
-    @Throws(IOException::class)
-    private fun handelSocketReadEvent(result: Int) {
+    override fun handelSocketReadEvent(result: Int) {
         if (result == -1) {
-            /**链接失败，无数据，关闭会话*/
-            closeSession()
-            return
-        }
-        /**刷新消息读取时间*/
-        this.markLastReadTime()
+            /**消息读取错误，关闭连接*/
+            closeConnect()
+        } else {
+            /**刷新最近消息读取时间*/
+            this.markLastReadTime()
 
-        mReadBuffer.position(0)
-        /**编码读取的消息*/
-        val message = mMessageDecoder.decode(mReadBuffer) ?: return
+            mReadBuffer.position(0)
+            /**编码读取的消息*/
+            val message = mMessageDecoder.decode(mReadBuffer) ?: return
 
-        LogUtils.logger.messageReceived(mSocketChannel!!, message)
-        if (message is HeartbeatRequest) {
-            /**识别为服务器期望客户端回执一条心跳消息，发送给服务器*/
-            send(heartbeatResponse)
-            return
+            this.messageReceived(message)
         }
-        this.messageReceived(message)
     }
 
-    private fun extendByteBuffer(mReadBuffer: ByteBuffer): ByteBuffer {
+    override fun extendByteBuffer(mReadBuffer: ByteBuffer): ByteBuffer {
         val newBuffer = ByteBuffer.allocate(mReadBuffer.capacity() + READ_BUFFER_SIZE / 2)
         mReadBuffer.position(0)
         newBuffer.put(mReadBuffer)
@@ -328,11 +305,10 @@ class IMConnectManager private constructor(val context: Context) {
         return newBuffer
     }
 
-    /**重设最近消息接收时间与重连计时*/
-    private fun markLastReadTime() {
+    override fun markLastReadTime() {
         mLastReadTime.set(System.currentTimeMillis())
-        mSessionIdleHandler.removeMessages(0)
-        mSessionIdleHandler.sendEmptyMessageDelayed(0, READ_IDLE_TIME.toLong())
+        mConnectCloseHandler.removeMessages(0)
+        mConnectCloseHandler.sendEmptyMessageDelayed(0, CONNECT_READ_IDLE_TIME)
     }
 
 }

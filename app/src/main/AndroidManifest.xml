@@ -48,7 +48,7 @@
 
         <!-- ****************************************IM推送配置 begin*************************************** -->
         <service
-            android:name="vip.qsos.im.lib.IMPushService"
+            android:name="vip.qsos.im.lib.IMService"
             android:process=":im_push" />
 
         <provider

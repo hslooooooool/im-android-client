@@ -4,7 +4,7 @@ import java.io.Serializable
 
 /**
  * @author : 华清松
- * 自定义消息对象
+ * 自定义消息对象。服务器主动推送到客户端的消息。
  */
 class Message : Serializable {
 

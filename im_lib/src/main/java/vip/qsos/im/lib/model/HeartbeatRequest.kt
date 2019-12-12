@@ -4,7 +4,7 @@ import vip.qsos.im.lib.constant.IMConstant
 
 /**
  * @author : 华清松
- * 服务端心跳请求实体
+ * 服务端心跳请求实体,客户端应发送一条心跳消息给服务器
  */
 class HeartbeatRequest private constructor() : IProtobufAble {
 

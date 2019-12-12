@@ -7,18 +7,16 @@ import android.net.Uri
 
 /**
  * @author : 华清松
- * 消息缓存管理器
+ * 消息缓存帮助类
  */
-object CIMCacheManager {
-
-    const val CIM_CONFIG_INFO = "CIM_CONFIG_INFO"
-
+object IMCacheHelper {
+    /**消息账号*/
     const val KEY_ACCOUNT = "KEY_ACCOUNT"
-
+    /**客户端设备ID*/
     const val KEY_DEVICE_ID = "KEY_DEVICE_ID"
-
+    /**是否手动断开服务*/
     const val KEY_MANUAL_STOP = "KEY_MANUAL_STOP"
-
+    /**消息服务是否已销毁*/
     const val KEY_IM_DESTROYED = "KEY_IM_DESTROYED"
     /**服务器域名*/
     const val KEY_IM_SERVER_HOST = "KEY_IM_SERVER_HOST"
@@ -59,13 +57,6 @@ object CIMCacheManager {
         return value
     }
 
-    private fun closeQuietly(cursor: Cursor?) {
-        try {
-            cursor?.close()
-        } catch (ignore: Exception) {
-        }
-    }
-
     fun putBoolean(context: Context, key: String, value: Boolean) {
         putString(context, key, java.lang.Boolean.toString(value))
     }
@@ -82,6 +73,13 @@ object CIMCacheManager {
     fun getInt(context: Context, key: String): Int {
         val value = getString(context, key)
         return if (value == null) 0 else Integer.parseInt(value)
+    }
+
+    private fun closeQuietly(cursor: Cursor?) {
+        try {
+            cursor?.close()
+        } catch (ignore: Exception) {
+        }
     }
 
 }

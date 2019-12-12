@@ -15,69 +15,56 @@ import vip.qsos.im.lib.model.SendBody
  * @author : 华清松
  * 消息接收广播服务
  */
-abstract class CIMEventBroadcastReceiver : BroadcastReceiver() {
+abstract class AbsIMEventBroadcastReceiver : BroadcastReceiver() {
     lateinit var context: Context
 
     override fun onReceive(context: Context, intent: Intent) {
         this.context = context
-        /*操作事件广播，用于提高 PushService 存活率*/
-        if (intent.action == Intent.ACTION_USER_PRESENT
-            || intent.action == Intent.ACTION_POWER_CONNECTED
-            || intent.action == Intent.ACTION_POWER_DISCONNECTED
-        ) {
-            startPushService()
-        }
-
-        /*设备网络状态变化事件*/
-        if (
-            intent.action == IMConstant.IntentAction.ACTION_NETWORK_CHANGED
-            || intent.action == ConnectivityManager.CONNECTIVITY_ACTION
-        ) {
-            onDevicesNetworkChanged()
-        }
-
-        /*断开服务器事件*/
-        if (intent.action == IMConstant.IntentAction.ACTION_CONNECTION_CLOSED) {
-            onInnerConnectionClosed()
-        }
-
-        /*连接服务器失败事件*/
-        if (intent.action == IMConstant.IntentAction.ACTION_CONNECTION_FAILED) {
-            val interval = intent.getLongExtra("interval", IMConstant.RECONNECT_INTERVAL_TIME)
-            onConnectionFailed(interval)
-        }
-
-        /*连接服务器成功事件*/
-        if (intent.action == IMConstant.IntentAction.ACTION_CONNECTION_SUCCESS) {
-            onInnerConnectionSuccess()
-        }
-
-        /*收到消息事件*/
-        if (intent.action == IMConstant.IntentAction.ACTION_MESSAGE_RECEIVED) {
-            onInnerMessageReceived(
-                intent.getSerializableExtra(Message::class.java.name) as Message,
-                intent
-            )
-        }
-
-        /*获取收到 ReplyBody 成功事件*/
-        if (intent.action == IMConstant.IntentAction.ACTION_REPLY_RECEIVED) {
-            onReplyReceived(intent.getSerializableExtra(ReplyBody::class.java.name) as ReplyBody)
-        }
-
-        /*获取 SendBody 发送成功事件*/
-        if (intent.action == IMConstant.IntentAction.ACTION_SENT_SUCCESS) {
-            onSentSucceed(intent.getSerializableExtra(SendBody::class.java.name) as SendBody)
-        }
-
-        /*重新连接，如果断开的话*/
-        if (intent.action == IMConstant.IntentAction.ACTION_CONNECTION_RECOVERY) {
-            connect(0)
+        when (intent.action) {
+            Intent.ACTION_USER_PRESENT, Intent.ACTION_POWER_CONNECTED, Intent.ACTION_POWER_DISCONNECTED -> {
+                /**操作事件广播，用于提高 PushService 存活率*/
+                startPushService()
+            }
+            IMConstant.IntentAction.ACTION_NETWORK_CHANGED, ConnectivityManager.CONNECTIVITY_ACTION -> {
+                /**设备网络状态变化事件*/
+                onDevicesNetworkChanged()
+            }
+            IMConstant.IntentAction.ACTION_CONNECTION_CLOSED -> {
+                /**消息服务器断开事件*/
+                onInnerConnectionClosed()
+            }
+            IMConstant.IntentAction.ACTION_CONNECTION_FAILED -> {
+                /**连接服务器失败事件*/
+                onConnectionFailed(IMConstant.RECONNECT_INTERVAL_TIME)
+            }
+            IMConstant.IntentAction.ACTION_CONNECTION_SUCCESS -> {
+                /**连接服务器成功事件*/
+                onInnerConnectionSuccess()
+            }
+            IMConstant.IntentAction.ACTION_MESSAGE_RECEIVED -> {
+                /**收到服务器自定义消息事件*/
+                onInnerMessageReceived(
+                    intent.getSerializableExtra(Message::class.java.name) as Message,
+                    intent
+                )
+            }
+            IMConstant.IntentAction.ACTION_REPLY_RECEIVED -> {
+                /**收到服务器回执事件*/
+                onReplyReceived(intent.getSerializableExtra(ReplyBody::class.java.name) as ReplyBody)
+            }
+            IMConstant.IntentAction.ACTION_SENT_SUCCESS -> {
+                /**发送成功事件*/
+                onSentSucceed(intent.getSerializableExtra(SendBody::class.java.name) as SendBody)
+            }
+            IMConstant.IntentAction.ACTION_CONNECTION_RECOVERY -> {
+                /*重新连接，如果断开的话*/
+                connect(0)
+            }
         }
     }
 
     private fun startPushService() {
-        val intent = Intent(context, IMPushService::class.java)
+        val intent = Intent(context, IMService::class.java)
         intent.action = CIMPushManager.ACTION_ACTIVATE_PUSH_SERVICE
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             context.startForegroundService(intent)
@@ -87,7 +74,7 @@ abstract class CIMEventBroadcastReceiver : BroadcastReceiver() {
     }
 
     private fun onInnerConnectionClosed() {
-        CIMCacheManager.putBoolean(context, CIMCacheManager.KEY_CIM_CONNECTION_STATE, false)
+        IMCacheHelper.putBoolean(context, IMCacheHelper.KEY_CIM_CONNECTION_STATE, false)
         if (CIMPushManager.isNetworkConnected(context)) {
             connect(0)
         }
@@ -102,7 +89,7 @@ abstract class CIMEventBroadcastReceiver : BroadcastReceiver() {
     }
 
     private fun onInnerConnectionSuccess() {
-        CIMCacheManager.putBoolean(context, CIMCacheManager.KEY_CIM_CONNECTION_STATE, true)
+        IMCacheHelper.putBoolean(context, IMCacheHelper.KEY_CIM_CONNECTION_STATE, true)
         val autoBind = CIMPushManager.autoBindAccount(context)
         onConnectionSuccess(autoBind)
     }
@@ -115,8 +102,8 @@ abstract class CIMEventBroadcastReceiver : BroadcastReceiver() {
     }
 
     private fun connect(delay: Long) {
-        val serviceIntent = Intent(context, IMPushService::class.java)
-        serviceIntent.putExtra(IMPushService.KEY_DELAYED_TIME, delay)
+        val serviceIntent = Intent(context, IMService::class.java)
+        serviceIntent.putExtra(IMService.KEY_DELAYED_TIME, delay)
         serviceIntent.action = CIMPushManager.ACTION_CREATE_CONNECTION
         CIMPushManager.startService(context, serviceIntent)
     }
