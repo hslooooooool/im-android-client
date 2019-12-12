@@ -53,7 +53,9 @@ interface IMConstant {
             const val ACTION_MESSAGE_RECEIVED = "ACTION_MESSAGE_RECEIVED"
             // 消息发送成功广播
             const val ACTION_SENT_SUCCESS = "ACTION_SENT_SUCCESS"
-            // 链接意外关闭广播
+            // 消息发送失败广播
+            const val ACTION_SENT_FAILED = "ACTION_SENT_FAILED"
+            // 链接关闭广播
             const val ACTION_CONNECTION_CLOSED = "ACTION_CONNECTION_CLOSED"
             // 链接失败广播
             const val ACTION_CONNECTION_FAILED = "ACTION_CONNECTION_FAILED"

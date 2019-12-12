@@ -4,10 +4,7 @@ import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.Service
-import android.content.BroadcastReceiver
-import android.content.Context
-import android.content.Intent
-import android.content.IntentFilter
+import android.content.*
 import android.net.ConnectivityManager
 import android.net.Network
 import android.os.Build
@@ -24,9 +21,9 @@ import vip.qsos.im.lib.model.SendBody
  * 消息服务连接服务
  */
 class IMPushService : Service() {
-    private var manager: IMConnectorManager? = null
-    private var keepAliveReceiver: KeepAliveBroadcastReceiver? = null
-    private var connectivityManager: ConnectivityManager? = null
+    private var mConnectManager: IMConnectManager? = null
+    private var mKeepAliveReceiver: KeepAliveBroadcastReceiver? = null
+    private var mConnectivityManager: ConnectivityManager? = null
 
     /**网络情况监听*/
     private var networkCallback: ConnectivityManager.NetworkCallback =
@@ -56,16 +53,20 @@ class IMPushService : Service() {
         true
     }
 
+    override fun startForegroundService(service: Intent?): ComponentName? {
+
+        return super.startForegroundService(service)
+    }
     override fun onCreate() {
-        manager = IMConnectorManager.getManager(this.applicationContext)
+        mConnectManager = IMConnectManager.getManager(this.applicationContext)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            keepAliveReceiver = KeepAliveBroadcastReceiver()
-            registerReceiver(keepAliveReceiver, keepAliveReceiver!!.intentFilter)
+            mKeepAliveReceiver = KeepAliveBroadcastReceiver()
+            registerReceiver(mKeepAliveReceiver, mKeepAliveReceiver!!.intentFilter)
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            connectivityManager =
+            mConnectivityManager =
                 getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-            connectivityManager!!.registerDefaultNetworkCallback(networkCallback)
+            mConnectivityManager!!.registerDefaultNetworkCallback(networkCallback)
         }
     }
 
@@ -85,22 +86,22 @@ class IMPushService : Service() {
             channel.setSound(null, null)
             notificationManager.createNotificationChannel(channel)
             val notification = Notification.Builder(this, channel.id)
-                .setContentTitle("Push service")
-                .setContentText("Push service is running")
+                .setContentTitle("IM消息服务")
+                .setContentText("IM消息服务正在运行，请保持")
                 .build()
             startForeground(NOTIFICATION_ID, notification)
         }
 
         mIntent = mIntent ?: Intent(CIMPushManager.ACTION_ACTIVATE_PUSH_SERVICE)
         when (mIntent.action) {
-            CIMPushManager.ACTION_CREATE_CIM_CONNECTION -> {
+            CIMPushManager.ACTION_CREATE_CONNECTION -> {
                 connect(mIntent.getLongExtra(KEY_DELAYED_TIME, 0))
             }
             CIMPushManager.ACTION_SEND_REQUEST_BODY -> {
-                manager!!.send(mIntent.getSerializableExtra(CIMPushManager.KEY_SEND_BODY) as SendBody)
+                mConnectManager!!.send(mIntent.getSerializableExtra(CIMPushManager.KEY_SEND_BODY) as SendBody)
             }
-            CIMPushManager.ACTION_CLOSE_CIM_CONNECTION -> {
-                manager!!.closeSession()
+            CIMPushManager.ACTION_CLOSE_CONNECTION -> {
+                mConnectManager!!.closeSession()
             }
             CIMPushManager.ACTION_ACTIVATE_PUSH_SERVICE -> {
                 handleKeepAlive()
@@ -135,11 +136,11 @@ class IMPushService : Service() {
             Log.e(this.javaClass.simpleName, "Invalid host or port. host:$host port:$port")
             return
         }
-        manager!!.connect(host!!, port)
+        mConnectManager!!.connect(host!!, port)
     }
 
     private fun handleKeepAlive() {
-        if (manager!!.isConnected) {
+        if (mConnectManager!!.isConnected) {
             LogUtils.logger.connectState(true)
             return
         }
@@ -152,17 +153,14 @@ class IMPushService : Service() {
 
     override fun onDestroy() {
         super.onDestroy()
-        manager!!.destroy()
+        mConnectManager!!.destroy()
         mConnectHandler.removeMessages(0)
         mNotificationHandler.removeMessages(0)
-
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            unregisterReceiver(keepAliveReceiver)
-
+            unregisterReceiver(mKeepAliveReceiver)
         }
-
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            connectivityManager!!.unregisterNetworkCallback(networkCallback)
+            mConnectivityManager!!.unregisterNetworkCallback(networkCallback)
         }
     }
 
@@ -182,10 +180,9 @@ class IMPushService : Service() {
     }
 
     companion object {
-        val KEY_DELAYED_TIME = "KEY_DELAYED_TIME"
-        val KEY_LOGGER_ENABLE = "KEY_LOGGER_ENABLE"
-
-        private val NOTIFICATION_ID = Integer.MAX_VALUE
+        private const val NOTIFICATION_ID = Integer.MAX_VALUE
+        const val KEY_DELAYED_TIME = "KEY_DELAYED_TIME"
+        const val KEY_LOGGER_ENABLE = "KEY_LOGGER_ENABLE"
     }
 
 }

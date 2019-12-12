@@ -127,6 +127,7 @@ public final class MessageProto {
         /**
          * <code>optional int64 id = 1;</code>
          */
+        @Override
         public long getId() {
             return id_;
         }
@@ -153,6 +154,7 @@ public final class MessageProto {
         /**
          * <code>optional string action = 2;</code>
          */
+        @Override
         public String getAction() {
             return action_;
         }
@@ -160,6 +162,7 @@ public final class MessageProto {
         /**
          * <code>optional string action = 2;</code>
          */
+        @Override
         public com.google.protobuf.ByteString
         getActionBytes() {
             return com.google.protobuf.ByteString.copyFromUtf8(action_);
@@ -204,6 +207,7 @@ public final class MessageProto {
         /**
          * <code>optional string content = 3;</code>
          */
+        @Override
         public String getContent() {
             return content_;
         }
@@ -211,6 +215,7 @@ public final class MessageProto {
         /**
          * <code>optional string content = 3;</code>
          */
+        @Override
         public com.google.protobuf.ByteString
         getContentBytes() {
             return com.google.protobuf.ByteString.copyFromUtf8(content_);
@@ -255,6 +260,7 @@ public final class MessageProto {
         /**
          * <code>optional string sender = 4;</code>
          */
+        @Override
         public String getSender() {
             return sender_;
         }
@@ -262,6 +268,7 @@ public final class MessageProto {
         /**
          * <code>optional string sender = 4;</code>
          */
+        @Override
         public com.google.protobuf.ByteString
         getSenderBytes() {
             return com.google.protobuf.ByteString.copyFromUtf8(sender_);
@@ -306,6 +313,7 @@ public final class MessageProto {
         /**
          * <code>optional string receiver = 5;</code>
          */
+        @Override
         public String getReceiver() {
             return receiver_;
         }
@@ -313,6 +321,7 @@ public final class MessageProto {
         /**
          * <code>optional string receiver = 5;</code>
          */
+        @Override
         public com.google.protobuf.ByteString
         getReceiverBytes() {
             return com.google.protobuf.ByteString.copyFromUtf8(receiver_);
@@ -357,6 +366,7 @@ public final class MessageProto {
         /**
          * <code>optional string extra = 6;</code>
          */
+        @Override
         public String getExtra() {
             return extra_;
         }
@@ -364,6 +374,7 @@ public final class MessageProto {
         /**
          * <code>optional string extra = 6;</code>
          */
+        @Override
         public com.google.protobuf.ByteString
         getExtraBytes() {
             return com.google.protobuf.ByteString.copyFromUtf8(extra_);
@@ -408,6 +419,7 @@ public final class MessageProto {
         /**
          * <code>optional string title = 7;</code>
          */
+        @Override
         public String getTitle() {
             return title_;
         }
@@ -415,6 +427,7 @@ public final class MessageProto {
         /**
          * <code>optional string title = 7;</code>
          */
+        @Override
         public com.google.protobuf.ByteString
         getTitleBytes() {
             return com.google.protobuf.ByteString.copyFromUtf8(title_);
@@ -467,6 +480,7 @@ public final class MessageProto {
         /**
          * <code>optional string format = 8;</code>
          */
+        @Override
         public com.google.protobuf.ByteString
         getFormatBytes() {
             return com.google.protobuf.ByteString.copyFromUtf8(format_);
@@ -511,6 +525,7 @@ public final class MessageProto {
         /**
          * <code>optional int64 timestamp = 9;</code>
          */
+        @Override
         public long getTimestamp() {
             return timestamp_;
         }
@@ -531,6 +546,7 @@ public final class MessageProto {
             timestamp_ = 0L;
         }
 
+        @Override
         public void writeTo(com.google.protobuf.CodedOutputStream output)
                 throws java.io.IOException {
             if (id_ != 0L) {
@@ -562,9 +578,12 @@ public final class MessageProto {
             }
         }
 
+        @Override
         public int getSerializedSize() {
             int size = memoizedSerializedSize;
-            if (size != -1) return size;
+            if (size != -1) {
+                return size;
+            }
 
             size = 0;
             if (id_ != 0L) {
@@ -702,6 +721,7 @@ public final class MessageProto {
             /**
              * <code>optional int64 id = 1;</code>
              */
+            @Override
             public long getId() {
                 return instance.getId();
             }
@@ -727,6 +747,7 @@ public final class MessageProto {
             /**
              * <code>optional string action = 2;</code>
              */
+            @Override
             public String getAction() {
                 return instance.getAction();
             }
@@ -734,6 +755,7 @@ public final class MessageProto {
             /**
              * <code>optional string action = 2;</code>
              */
+            @Override
             public com.google.protobuf.ByteString
             getActionBytes() {
                 return instance.getActionBytes();
@@ -771,6 +793,7 @@ public final class MessageProto {
             /**
              * <code>optional string content = 3;</code>
              */
+            @Override
             public String getContent() {
                 return instance.getContent();
             }
@@ -778,6 +801,7 @@ public final class MessageProto {
             /**
              * <code>optional string content = 3;</code>
              */
+            @Override
             public com.google.protobuf.ByteString
             getContentBytes() {
                 return instance.getContentBytes();
@@ -815,6 +839,7 @@ public final class MessageProto {
             /**
              * <code>optional string sender = 4;</code>
              */
+            @Override
             public String getSender() {
                 return instance.getSender();
             }
@@ -822,6 +847,7 @@ public final class MessageProto {
             /**
              * <code>optional string sender = 4;</code>
              */
+            @Override
             public com.google.protobuf.ByteString
             getSenderBytes() {
                 return instance.getSenderBytes();
@@ -859,6 +885,7 @@ public final class MessageProto {
             /**
              * <code>optional string receiver = 5;</code>
              */
+            @Override
             public String getReceiver() {
                 return instance.getReceiver();
             }
@@ -866,6 +893,7 @@ public final class MessageProto {
             /**
              * <code>optional string receiver = 5;</code>
              */
+            @Override
             public com.google.protobuf.ByteString
             getReceiverBytes() {
                 return instance.getReceiverBytes();
@@ -903,6 +931,7 @@ public final class MessageProto {
             /**
              * <code>optional string extra = 6;</code>
              */
+            @Override
             public String getExtra() {
                 return instance.getExtra();
             }
@@ -910,6 +939,7 @@ public final class MessageProto {
             /**
              * <code>optional string extra = 6;</code>
              */
+            @Override
             public com.google.protobuf.ByteString
             getExtraBytes() {
                 return instance.getExtraBytes();
@@ -947,6 +977,7 @@ public final class MessageProto {
             /**
              * <code>optional string title = 7;</code>
              */
+            @Override
             public String getTitle() {
                 return instance.getTitle();
             }
@@ -954,6 +985,7 @@ public final class MessageProto {
             /**
              * <code>optional string title = 7;</code>
              */
+            @Override
             public com.google.protobuf.ByteString
             getTitleBytes() {
                 return instance.getTitleBytes();
@@ -991,6 +1023,7 @@ public final class MessageProto {
             /**
              * <code>optional string format = 8;</code>
              */
+            @Override
             public String getFormat() {
                 return instance.getFormat();
             }
@@ -998,6 +1031,7 @@ public final class MessageProto {
             /**
              * <code>optional string format = 8;</code>
              */
+            @Override
             public com.google.protobuf.ByteString
             getFormatBytes() {
                 return instance.getFormatBytes();
@@ -1035,6 +1069,7 @@ public final class MessageProto {
             /**
              * <code>optional int64 timestamp = 9;</code>
              */
+            @Override
             public long getTimestamp() {
                 return instance.getTimestamp();
             }
@@ -1060,6 +1095,7 @@ public final class MessageProto {
             // @@protoc_insertion_point(builder_scope:Model)
         }
 
+        @Override
         protected final Object dynamicMethod(
                 com.google.protobuf.GeneratedMessageLite.MethodToInvoke method,
                 Object arg0, Object arg1) {

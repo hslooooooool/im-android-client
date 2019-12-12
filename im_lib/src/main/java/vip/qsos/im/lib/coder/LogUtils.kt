@@ -31,9 +31,24 @@ class LogUtils private constructor() {
         }
     }
 
-    fun messageSent(session: SocketChannel, message: Any) {
+    fun messageSentSuccess(session: SocketChannel, message: Any) {
         if (debug) {
             Log.i(TAG, String.format("[  SENT  ]" + getSessionInfo(session) + "\n%s", message))
+        }
+    }
+
+    fun messageSentFailed(session: SocketChannel, message: Any) {
+        if (debug) {
+            Log.i(
+                TAG,
+                String.format("[  SENT FAILED  ]" + getSessionInfo(session) + "\n%s", message)
+            )
+        }
+    }
+
+    fun messageSentException(e: Exception) {
+        if (debug) {
+            Log.i(TAG, "[  SENT EXCEPTION  ] ${e.message}")
         }
     }
 
@@ -64,6 +79,12 @@ class LogUtils private constructor() {
     fun startConnect(host: String, port: Int) {
         if (debug) {
             Log.i(TAG, "START CONNECT REMOTE HOST:$host PORT:$port")
+        }
+    }
+
+    fun networkState(connect: Boolean) {
+        if (debug) {
+            Log.i(TAG, "NETWORK IS OK = $connect")
         }
     }
 

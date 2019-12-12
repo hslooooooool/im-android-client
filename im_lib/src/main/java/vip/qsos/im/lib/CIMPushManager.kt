@@ -20,12 +20,12 @@ object CIMPushManager {
 
     const val ACTION_SET_LOGGER_ENABLE = "ACTION_SET_LOGGER_ENABLE"
     const val ACTION_SEND_REQUEST_BODY = "ACTION_SEND_REQUEST_BODY"
-    const val ACTION_CLOSE_CIM_CONNECTION = "ACTION_CLOSE_CIM_CONNECTION"
-    const val ACTION_CREATE_CIM_CONNECTION = "ACTION_CREATE_CIM_CONNECTION"
+    const val ACTION_CLOSE_CONNECTION = "ACTION_CLOSE_CONNECTION"
+    const val ACTION_CREATE_CONNECTION = "ACTION_CREATE_CONNECTION"
     const val ACTION_ACTIVATE_PUSH_SERVICE = "ACTION_ACTIVATE_PUSH_SERVICE"
 
     const val KEY_SEND_BODY = "KEY_SEND_BODY"
-    const val KEY_IM_CONNECTION_STATUS = "KEY_IM_CONNECTION_STATUS"
+    const val KEY_CONNECTION_STATUS = "KEY_CONNECTION_STATUS"
 
     /**
      * 初始化,连接服务端，在程序启动页或在 Application 里调用
@@ -45,13 +45,13 @@ object CIMPushManager {
         CIMCacheManager.putBoolean(context, CIMCacheManager.KEY_MANUAL_STOP, false)
         CIMCacheManager.remove(context, CIMCacheManager.KEY_ACCOUNT)
 
-        val serviceIntent = Intent(context, IMPushService::class.java)
-        serviceIntent.action = ACTION_CREATE_CIM_CONNECTION
+        val serviceIntent = Intent(context.applicationContext, IMPushService::class.java)
+        serviceIntent.action = ACTION_CREATE_CONNECTION
         startService(context, serviceIntent)
     }
 
     fun setLoggerEnable(context: Context, enable: Boolean) {
-        val serviceIntent = Intent(context, IMPushService::class.java)
+        val serviceIntent = Intent(context.applicationContext, IMPushService::class.java)
         serviceIntent.putExtra(IMPushService.KEY_LOGGER_ENABLE, enable)
         serviceIntent.action = ACTION_SET_LOGGER_ENABLE
         startService(context, serviceIntent)
@@ -60,8 +60,7 @@ object CIMPushManager {
     /**
      * 设置一个账号登录到服务端
      *
-     * @param account
-     * 用户唯一ID
+     * @param account 用户唯一ID
      */
     fun bindAccount(context: Context, account: String?) {
         if (isDestroyed(context) || TextUtils.isEmpty(account)) {
@@ -75,7 +74,8 @@ object CIMPushManager {
         CIMCacheManager.putString(context, CIMCacheManager.KEY_ACCOUNT, account)
         var deviceId = CIMCacheManager.getString(context, CIMCacheManager.KEY_DEVICE_ID)
         if (TextUtils.isEmpty(deviceId)) {
-            deviceId = UUID.randomUUID().toString().replace("-".toRegex(), "").toUpperCase()
+            deviceId =
+                UUID.randomUUID().toString().replace("-".toRegex(), "").toUpperCase(Locale.ENGLISH)
             CIMCacheManager.putString(context, CIMCacheManager.KEY_DEVICE_ID, deviceId)
         }
         val sent = SendBody()
@@ -100,48 +100,40 @@ object CIMPushManager {
     }
 
     /**
-     * 发送一个CIM请求
+     * 往服务器发送消息
      *
-     * @param context
-     * @body
+     * @param context 上下文
+     * @param body 发送消息实体
      */
     fun sendRequest(context: Context, body: SendBody) {
         if (isDestroyed(context) || isStop(context)) {
             return
         }
-        val serviceIntent = Intent(context, IMPushService::class.java)
+        val serviceIntent = Intent(context.applicationContext, IMPushService::class.java)
         serviceIntent.putExtra(KEY_SEND_BODY, body)
         serviceIntent.action = ACTION_SEND_REQUEST_BODY
         startService(context, serviceIntent)
     }
 
-    /**
-     * 停止接受推送，将会退出当前账号登录，端口与服务端的连接
-     *
-     * @param context
-     */
+    /**停止接受推送，将会退出当前账号登录，断开与服务端的连接，可重连，需重新登录与连接*/
     fun stop(context: Context) {
-
         if (isDestroyed(context)) {
             return
         }
-
         CIMCacheManager.putBoolean(context, CIMCacheManager.KEY_MANUAL_STOP, true)
-
-        val serviceIntent = Intent(context, IMPushService::class.java)
-        serviceIntent.action = ACTION_CLOSE_CIM_CONNECTION
+        val serviceIntent = Intent(context.applicationContext, IMPushService::class.java)
+        serviceIntent.action = ACTION_CLOSE_CONNECTION
         startService(context, serviceIntent)
-
     }
 
     /**完全销毁消息服务，一般用于完全退出程序，调用 resume 将不能恢复*/
     fun destroy(context: Context) {
         CIMCacheManager.putBoolean(context, CIMCacheManager.KEY_IM_DESTROYED, true)
         CIMCacheManager.putString(context, CIMCacheManager.KEY_ACCOUNT, null)
-        context.stopService(Intent(context, IMPushService::class.java))
+        context.stopService(Intent(context.applicationContext, IMPushService::class.java))
     }
 
-    /**重新恢复接收推送，重新连接服务端，并登录当前账号*/
+    /**重新恢复接收推送，重新连接服务端，登录缓存的账号*/
     fun resume(context: Context) {
         if (isDestroyed(context)) {
             return
@@ -186,15 +178,14 @@ object CIMPushManager {
 
     /**获取APP版本名称*/
     private fun getVersionName(context: Context): String? {
-        var versionName: String?
-        try {
+        val versionName: String?
+        versionName = try {
             val mPackageInfo = context.packageManager.getPackageInfo(context.packageName, 0)
-            versionName = mPackageInfo.versionName
+            mPackageInfo.versionName
         } catch (ignore: NameNotFoundException) {
-            versionName = "unknown"
+            "unknown"
         }
         return versionName
     }
-
 
 }

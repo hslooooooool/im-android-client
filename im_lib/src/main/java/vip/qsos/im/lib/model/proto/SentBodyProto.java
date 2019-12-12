@@ -98,6 +98,7 @@ public final class SentBodyProto {
         /**
          * <code>optional string key = 1;</code>
          */
+        @Override
         public com.google.protobuf.ByteString
         getKeyBytes() {
             return com.google.protobuf.ByteString.copyFromUtf8(key_);
@@ -142,6 +143,7 @@ public final class SentBodyProto {
         /**
          * <code>optional int64 timestamp = 2;</code>
          */
+        @Override
         public long getTimestamp() {
             return timestamp_;
         }
@@ -192,6 +194,7 @@ public final class SentBodyProto {
             return data_;
         }
 
+        @Override
         public int getDataCount() {
             return internalGetData().size();
         }
@@ -200,6 +203,7 @@ public final class SentBodyProto {
          * <code>map&lt;string, string&gt; data = 3;</code>
          */
 
+        @Override
         public boolean containsData(
                 String key) {
             if (key == null) {
@@ -211,6 +215,7 @@ public final class SentBodyProto {
         /**
          * Use {@link #getDataMap()} instead.
          */
+        @Override
         @Deprecated
         public java.util.Map<String, String> getData() {
             return getDataMap();
@@ -220,6 +225,7 @@ public final class SentBodyProto {
          * <code>map&lt;string, string&gt; data = 3;</code>
          */
 
+        @Override
         public java.util.Map<String, String> getDataMap() {
             return java.util.Collections.unmodifiableMap(
                     internalGetData());
@@ -229,6 +235,7 @@ public final class SentBodyProto {
          * <code>map&lt;string, string&gt; data = 3;</code>
          */
 
+        @Override
         public String getDataOrDefault(
                 String key,
                 String defaultValue) {
@@ -244,6 +251,7 @@ public final class SentBodyProto {
          * <code>map&lt;string, string&gt; data = 3;</code>
          */
 
+        @Override
         public String getDataOrThrow(
                 String key) {
             if (key == null) {
@@ -284,7 +292,9 @@ public final class SentBodyProto {
         @Override
         public int getSerializedSize() {
             int size = memoizedSerializedSize;
-            if (size != -1) return size;
+            if (size != -1) {
+                return size;
+            }
 
             size = 0;
             if (!key_.isEmpty()) {
@@ -469,6 +479,7 @@ public final class SentBodyProto {
             }
 
 
+            @Override
             public int getDataCount() {
                 return instance.getDataMap().size();
             }
@@ -477,6 +488,7 @@ public final class SentBodyProto {
              * <code>map&lt;string, string&gt; data = 3;</code>
              */
 
+            @Override
             public boolean containsData(
                     String key) {
                 if (key == null) {
@@ -508,6 +520,7 @@ public final class SentBodyProto {
             /**
              * Use {@link #getDataMap()} instead.
              */
+            @Override
             @Deprecated
             public java.util.Map<String, String> getData() {
                 return getDataMap();
@@ -516,6 +529,7 @@ public final class SentBodyProto {
             /**
              * <code>map&lt;string, string&gt; data = 3;</code>
              */
+            @Override
             public java.util.Map<String, String> getDataMap() {
                 return java.util.Collections.unmodifiableMap(
                         instance.getDataMap());
@@ -525,6 +539,7 @@ public final class SentBodyProto {
              * <code>map&lt;string, string&gt; data = 3;</code>
              */
 
+            @Override
             public String getDataOrDefault(
                     String key,
                     String defaultValue) {
@@ -540,6 +555,7 @@ public final class SentBodyProto {
              * <code>map&lt;string, string&gt; data = 3;</code>
              */
 
+            @Override
             public String getDataOrThrow(
                     String key) {
                 if (key == null) {

@@ -52,7 +52,7 @@ abstract class CIMEventBroadcastReceiver : BroadcastReceiver() {
             onInnerConnectionSuccess()
         }
 
-        /*收到推送消息事件*/
+        /*收到消息事件*/
         if (intent.action == IMConstant.IntentAction.ACTION_MESSAGE_RECEIVED) {
             onInnerMessageReceived(
                 intent.getSerializableExtra(Message::class.java.name) as Message,
@@ -64,7 +64,6 @@ abstract class CIMEventBroadcastReceiver : BroadcastReceiver() {
         if (intent.action == IMConstant.IntentAction.ACTION_REPLY_RECEIVED) {
             onReplyReceived(intent.getSerializableExtra(ReplyBody::class.java.name) as ReplyBody)
         }
-
 
         /*获取 SendBody 发送成功事件*/
         if (intent.action == IMConstant.IntentAction.ACTION_SENT_SUCCESS) {
@@ -105,7 +104,7 @@ abstract class CIMEventBroadcastReceiver : BroadcastReceiver() {
     private fun onInnerConnectionSuccess() {
         CIMCacheManager.putBoolean(context, CIMCacheManager.KEY_CIM_CONNECTION_STATE, true)
         val autoBind = CIMPushManager.autoBindAccount(context)
-        onConnectionSuccessed(autoBind)
+        onConnectionSuccess(autoBind)
     }
 
     private fun onDevicesNetworkChanged() {
@@ -118,7 +117,7 @@ abstract class CIMEventBroadcastReceiver : BroadcastReceiver() {
     private fun connect(delay: Long) {
         val serviceIntent = Intent(context, IMPushService::class.java)
         serviceIntent.putExtra(IMPushService.KEY_DELAYED_TIME, delay)
-        serviceIntent.action = CIMPushManager.ACTION_CREATE_CIM_CONNECTION
+        serviceIntent.action = CIMPushManager.ACTION_CREATE_CONNECTION
         CIMPushManager.startService(context, serviceIntent)
     }
 
@@ -133,13 +132,14 @@ abstract class CIMEventBroadcastReceiver : BroadcastReceiver() {
         return IMConstant.MessageAction.ACTION_999 == action
     }
 
+    /**收到消息*/
     abstract fun onMessageReceived(message: Message, intent: Intent)
 
-    fun onNetworkChanged() {
+    open fun onNetworkChanged() {
         IMListenerManager.notifyOnNetworkChanged(CIMPushManager.getNetworkInfo(context)!!)
     }
 
-    open fun onConnectionSuccessed(hasAutoBind: Boolean) {
+    open fun onConnectionSuccess(hasAutoBind: Boolean) {
         IMListenerManager.notifyOnConnectionSuccess(hasAutoBind)
     }
 
@@ -155,7 +155,7 @@ abstract class CIMEventBroadcastReceiver : BroadcastReceiver() {
         IMListenerManager.notifyOnReplyReceived(body)
     }
 
-    fun onSentSucceed(body: SendBody) {
+    open fun onSentSucceed(body: SendBody) {
         IMListenerManager.notifyOnSentSucceed(body)
     }
 }

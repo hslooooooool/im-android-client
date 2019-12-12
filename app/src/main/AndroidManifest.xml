@@ -14,10 +14,10 @@
         android:allowBackup="true"
         android:icon="@drawable/icon"
         android:label="@string/app_name"
-        android:theme="@style/GlobeTheme"
+        android:theme="@style/Theme.AppCompat.Light.NoActionBar"
         tools:ignore="GoogleAppIndexingWarning">
         <activity
-            android:name="vip.qsos.im.ui.SplanshActivity"
+            android:name="vip.qsos.im.ui.SplashActivity"
             android:alwaysRetainTaskState="true"
             android:screenOrientation="portrait">
             <intent-filter>
@@ -27,13 +27,12 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="vip.qsos.im.ui.SystemMessageActivity"
+            android:name="vip.qsos.im.ui.MessageActivity"
             android:alwaysRetainTaskState="true"
             android:launchMode="singleTask"
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="com.farsunset.cim.look.notify" />
-
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
 
@@ -57,24 +56,34 @@
             android:authorities="${applicationId}.provider"
             android:exported="false"
             android:process=":im_push" />
-        <!-- android:authorities="${package}.cim.provider"-->
         <!-- ****************************************IM推送配置 end*************************************** -->
 
-        <!--消息接受广播注册-->
+        <!--消息接收广播注册-->
         <receiver android:name="vip.qsos.im.receiver.CIMPushManagerReceiver">
             <intent-filter android:priority="0x7fffffff">
-                <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />  <!-- 网络变化广播 targetVersion 24之前 -->
-                <action android:name="com.farsunset.cim.NETWORK_CHANGED" />  <!-- 网络变化广播 targetVersion 24之后-->
-                <action android:name="com.farsunset.cim.MESSAGE_RECEIVED" /><!-- 消息广播action -->
-                <action android:name="com.farsunset.cim.SENT_FAILED" /> <!-- 发送sendbody失败广播-->
-                <action android:name="com.farsunset.cim.SENT_SUCCESSED" /> <!-- 发送sendbody成功广播 -->
-                <action android:name="com.farsunset.cim.CONNECTION_RECOVERY" /> <!--重新连接 -->
-                <action android:name="com.farsunset.cim.CONNECTION_CLOSED" /> <!-- 链接意外关闭广播 -->
-                <action android:name="com.farsunset.cim.CONNECTION_FAILED" /> <!-- 链接失败广播 -->
-                <action android:name="com.farsunset.cim.CONNECTION_SUCCESSED" /> <!-- 链接成功广播-->
-                <action android:name="com.farsunset.cim.REPLY_RECEIVED" /> <!-- 发送sendbody成功后获得replaybody回应广播 -->
+                <action
+                    android:name="android.net.conn.CONNECTIVITY_CHANGE"
+                    tools:ignore="BatteryLife" />  <!-- 网络变化广播 targetVersion 24之前 -->
+                <!--网络变化广播-->
+                <action android:name="ACTION_NETWORK_CHANGED" />
+                <!--收到消息广播-->
+                <action android:name="ACTION_MESSAGE_RECEIVED" />
+                <!--消息发送失败广播-->
+                <action android:name="ACTION_SENT_FAILED" />
+                <!--消息发送成功广播-->
+                <action android:name="ACTION_SENT_SUCCESS" />
+                <!--重试连接-->
+                <action android:name="ACTION_CONNECTION_RECOVERY" />
+                <!--链接关闭广播-->
+                <action android:name="ACTION_CONNECTION_CLOSED" />
+                <!--链接失败广播-->
+                <action android:name="ACTION_CONNECTION_FAILED" />
+                <!--链接成功广播-->
+                <action android:name="ACTION_CONNECTION_SUCCESS" />
+                <!-- 消息发送成功后，获得服务器回执广播 -->
+                <action android:name="ACTION_REPLY_RECEIVED" />
 
-                <!-- 【可选】 一些常用的系统广播，增强pushservice的复活机会-->
+                <!-- 【可选】 一些常用的系统广播，增强 PushService 的复活机会-->
                 <action android:name="android.intent.action.USER_PRESENT" />
                 <action android:name="android.intent.action.ACTION_POWER_CONNECTED" />
                 <action android:name="android.intent.action.ACTION_POWER_DISCONNECTED" />

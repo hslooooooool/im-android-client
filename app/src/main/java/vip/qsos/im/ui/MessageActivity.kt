@@ -9,13 +9,17 @@ import android.widget.Toast
 import com.farsunset.ichat.example.R
 import kotlinx.android.synthetic.main.activity_system_chat.*
 import vip.qsos.im.adapter.SystemMsgListViewAdapter
-import vip.qsos.im.app.CIMMonitorActivity
+import vip.qsos.im.app.AbsIMActivity
 import vip.qsos.im.app.Constant
 import vip.qsos.im.lib.CIMPushManager
 import vip.qsos.im.lib.model.Message
 import java.util.*
 
-class SystemMessageActivity : CIMMonitorActivity(), OnClickListener {
+/**
+ * @author : 华清松
+ * 消息界面
+ */
+class MessageActivity : AbsIMActivity(), OnClickListener {
 
     lateinit var adapter: SystemMsgListViewAdapter
     private var list: ArrayList<Message> = arrayListOf()
@@ -35,11 +39,11 @@ class SystemMessageActivity : CIMMonitorActivity(), OnClickListener {
         account_1.text = this.intent.getStringExtra("account")
         adapter = SystemMsgListViewAdapter(this, list)
         chat_list.adapter = adapter
-        Toast.makeText(this, "登录成功，请通过后台页面发送消息吧^_^", Toast.LENGTH_LONG).show()
+        Toast.makeText(this, "登录成功", Toast.LENGTH_LONG).show()
     }
 
-    override fun onMessageReceived(arg0: Message) {
-        if (arg0.action == Constant.MessageAction.ACTION_999) {
+    override fun onMessageReceived(message: Message) {
+        if (message.action == Constant.MessageAction.ACTION_999) {
             //返回登录页面，停止接受消息
             CIMPushManager.stop(this)
             Toast.makeText(this, "你被系统强制下线!", Toast.LENGTH_LONG).show()
@@ -47,13 +51,13 @@ class SystemMessageActivity : CIMMonitorActivity(), OnClickListener {
             startActivity(intent)
             this.finish()
         } else {
-            list.add(arg0)
+            list.add(message)
             adapter.notifyDataSetChanged()
         }
     }
 
-    override fun onNetworkChanged(info: NetworkInfo?) {
-        if (info == null) {
+    override fun onNetworkChanged(networkInfo: NetworkInfo?) {
+        if (networkInfo == null) {
             Toast.makeText(this, "网络已断开!", Toast.LENGTH_LONG).show()
         } else {
             Toast.makeText(this, "网络已恢复，重新连接....", Toast.LENGTH_LONG).show()

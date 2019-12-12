@@ -10,7 +10,11 @@ import vip.qsos.im.lib.model.Message
 import vip.qsos.im.lib.model.ReplyBody
 import vip.qsos.im.lib.model.SendBody
 
-abstract class CIMMonitorActivity : Activity(), IMEventListener {
+/**
+ * @author : 华清松
+ * 消息服务活动基类
+ */
+abstract class AbsIMActivity : Activity(), IMEventListener {
 
     public override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -27,20 +31,19 @@ abstract class CIMMonitorActivity : Activity(), IMEventListener {
         IMListenerManager.registerMessageListener(this)
     }
 
-    override fun onMessageReceived(arg0: Message) {}
+    override fun onMessageReceived(message: Message) {}
 
-    override fun onNetworkChanged(info: NetworkInfo?) {}
+    override fun onNetworkChanged(networkInfo: NetworkInfo?) {}
 
     override fun onConnectionClosed() {}
 
     override fun onConnectionFailed() {}
 
-    override val eventDispatchOrder: Int
-        get() = 0
+    override val eventDispatchOrder: Int = 0
 
-    override fun onConnectionSuccess(arg0: Boolean) {}
+    override fun onConnectionSuccess(hasAutoBind: Boolean) {}
 
-    override fun onReplyReceived(arg0: ReplyBody) {}
+    override fun onReplyReceived(replyBody: ReplyBody) {}
 
-    override fun onSentSuccess(sentBody: SendBody) {}
+    override fun onSentSuccess(sendBody: SendBody) {}
 }

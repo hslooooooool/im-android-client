@@ -15,7 +15,7 @@ import vip.qsos.im.lib.CIMEventBroadcastReceiver
 import vip.qsos.im.lib.IMListenerManager
 import vip.qsos.im.lib.model.Message
 import vip.qsos.im.lib.model.ReplyBody
-import vip.qsos.im.ui.SystemMessageActivity
+import vip.qsos.im.ui.MessageActivity
 
 /**
  * @author : 华清松
@@ -23,7 +23,6 @@ import vip.qsos.im.ui.SystemMessageActivity
  */
 class CIMPushManagerReceiver : CIMEventBroadcastReceiver() {
 
-    //当收到消息时，会执行onMessageReceived，这里是消息第一入口
     override fun onMessageReceived(message: Message, intent: Intent) {
         //调用分发消息监听
         IMListenerManager.notifyOnMessageReceived(message)
@@ -51,7 +50,7 @@ class CIMPushManagerReceiver : CIMEventBroadcastReceiver() {
         val contentIntent = PendingIntent.getActivity(
             context,
             1,
-            Intent(context, SystemMessageActivity::class.java),
+            Intent(context, MessageActivity::class.java),
             PendingIntent.FLAG_UPDATE_CURRENT
         )
         val builder = NotificationCompat.Builder(context, channelId!!)
@@ -72,7 +71,7 @@ class CIMPushManagerReceiver : CIMEventBroadcastReceiver() {
         IMListenerManager.notifyOnNetworkChanged(info)
     }
 
-    override fun onConnectionSuccessed(hasAutoBind: Boolean) {
+    override fun onConnectionSuccess(hasAutoBind: Boolean) {
         IMListenerManager.notifyOnConnectionSuccess(hasAutoBind)
     }
 
