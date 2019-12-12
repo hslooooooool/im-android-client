@@ -7,7 +7,7 @@ import android.net.ConnectivityManager
 import android.net.NetworkInfo
 import android.os.Build
 import android.text.TextUtils
-import vip.qsos.im.lib.coder.LogUtils
+import vip.qsos.im.lib.coder.IMLogUtils
 import vip.qsos.im.lib.constant.IMConstant
 import vip.qsos.im.lib.model.SendBody
 import java.util.*
@@ -16,7 +16,7 @@ import java.util.*
  * @author : 华清松
  * IM消息推送服务管理类
  */
-object CIMPushManager {
+object IMManagerHelper {
     /**【动作】开启消息服务日志*/
     const val ACTION_SET_LOGGER_ENABLE = "ACTION_SET_LOGGER_ENABLE"
     /**【动作】发送消息到服务器*/
@@ -40,7 +40,7 @@ object CIMPushManager {
      */
     fun connect(context: Context, host: String, port: Int) {
         if (TextUtils.isEmpty(host) || port == 0) {
-            LogUtils.logger.invalidHostPort(host, port)
+            IMLogUtils.LOGGER.invalidHostPort(host, port)
             return
         }
         IMCacheHelper.putString(context, IMCacheHelper.KEY_IM_SERVER_HOST, host)
@@ -119,7 +119,10 @@ object CIMPushManager {
         startService(context, serviceIntent)
     }
 
-    /**停止接受推送，将会退出当前账号登录，断开与服务端的连接，可重连，需重新登录与连接*/
+    /**停止接受推送，将会退出当前账号登录，断开与服务端的连接，可重连，需重新登录与连接，
+     * 调用 resume 将可恢复
+     * @see resume
+     * */
     fun stop(context: Context) {
         if (isDestroyed(context)) {
             return

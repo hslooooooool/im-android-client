@@ -10,7 +10,7 @@ import com.farsunset.ichat.example.R
 import kotlinx.android.synthetic.main.activity_login.*
 import vip.qsos.im.app.AbsIMActivity
 import vip.qsos.im.app.Constant
-import vip.qsos.im.lib.CIMPushManager
+import vip.qsos.im.lib.IMManagerHelper
 import vip.qsos.im.lib.constant.IMConstant
 import vip.qsos.im.lib.model.ReplyBody
 
@@ -41,17 +41,17 @@ class LoginActivity : AbsIMActivity(), OnClickListener {
         val account = account_1.text.toString().trim()
         if (!TextUtils.isEmpty(account)) {
             progressDialog.show()
-            if (CIMPushManager.isConnected(this)) {
-                CIMPushManager.bindAccount(this, account)
+            if (IMManagerHelper.isConnected(this)) {
+                IMManagerHelper.bindAccount(this, account)
             } else {
-                CIMPushManager.connect(this, Constant.CIM_SERVER_HOST, Constant.CIM_SERVER_PORT)
+                IMManagerHelper.connect(this, Constant.CIM_SERVER_HOST, Constant.CIM_SERVER_PORT)
             }
         }
     }
 
     override fun onConnectionSuccess(hasAutoBind: Boolean) {
         if (!hasAutoBind) {
-            CIMPushManager.bindAccount(this, account_1.text.toString().trim { it <= ' ' })
+            IMManagerHelper.bindAccount(this, account_1.text.toString().trim { it <= ' ' })
         }
     }
 
@@ -71,7 +71,7 @@ class LoginActivity : AbsIMActivity(), OnClickListener {
     }
 
     override fun onBackPressed() {
-        CIMPushManager.destroy(this)
+        IMManagerHelper.destroy(this)
         super.onBackPressed()
     }
 

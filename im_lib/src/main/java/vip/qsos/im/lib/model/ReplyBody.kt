@@ -22,7 +22,7 @@ class ReplyBody : Serializable {
     /**返回时间*/
     var timestamp: Long = 0L
     /**返回数据集合*/
-    val data: Hashtable<String, String> = Hashtable()
+    private val data: Hashtable<String, String> = Hashtable()
 
     private val keySet: Set<String>
         get() = data.keys

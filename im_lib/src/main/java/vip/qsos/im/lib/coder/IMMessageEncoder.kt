@@ -8,7 +8,7 @@ import java.nio.ByteBuffer
  * @author : 华清松
  * 客户端消息发送前编码
  */
-class ClientMessageEncoder {
+class IMMessageEncoder {
 
     /**对消息数据进行编码 */
     fun encode(obj: Any): ByteBuffer {

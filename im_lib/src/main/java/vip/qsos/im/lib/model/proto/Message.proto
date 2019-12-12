@@ -1,5 +1,5 @@
 syntax = "proto3";
-package com.farsunset.cim.sdk.android.model.proto;
+package vip.qsos.im.lib.model.proto;
 option java_outer_classname="MessageProto";
 message Model {
    // 消息ID

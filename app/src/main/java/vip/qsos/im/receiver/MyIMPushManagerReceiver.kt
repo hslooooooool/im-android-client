@@ -21,7 +21,7 @@ import vip.qsos.im.ui.MessageActivity
  * @author : 华清松
  * 消息接收广播服务
  */
-class CIMPushManagerReceiver : AbsIMEventBroadcastReceiver() {
+class MyIMPushManagerReceiver : AbsIMEventBroadcastReceiver() {
 
     override fun onMessageReceived(message: Message, intent: Intent) {
         //调用分发消息监听

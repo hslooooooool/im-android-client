@@ -2,7 +2,7 @@ package vip.qsos.im.lib
 
 import android.net.NetworkInfo
 import android.util.Log
-import vip.qsos.im.lib.coder.LogUtils
+import vip.qsos.im.lib.coder.IMLogUtils
 import vip.qsos.im.lib.model.Message
 import vip.qsos.im.lib.model.ReplyBody
 import vip.qsos.im.lib.model.SendBody
@@ -36,7 +36,7 @@ object IMListenerManager {
 
     /**注册消息广播监听*/
     fun notifyOnNetworkChanged(info: NetworkInfo) {
-        LogUtils.logger.networkState(info.isConnected)
+        IMLogUtils.LOGGER.networkState(info.isConnected)
         for (listener in mListenerList) {
             listener.onNetworkChanged(info)
         }

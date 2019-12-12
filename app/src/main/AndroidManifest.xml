@@ -59,7 +59,7 @@
         <!-- ****************************************IM推送配置 end*************************************** -->
 
         <!--消息接收广播注册-->
-        <receiver android:name="vip.qsos.im.receiver.CIMPushManagerReceiver">
+        <receiver android:name="vip.qsos.im.receiver.MyIMPushManagerReceiver">
             <intent-filter android:priority="0x7fffffff">
                 <action
                     android:name="android.net.conn.CONNECTIVITY_CHANGE"

@@ -13,7 +13,7 @@ import vip.qsos.im.lib.model.SendBody
 
 /**
  * @author : 华清松
- * 消息接收广播服务
+ * 消息接收基础广播
  */
 abstract class AbsIMEventBroadcastReceiver : BroadcastReceiver() {
     lateinit var context: Context
@@ -65,7 +65,7 @@ abstract class AbsIMEventBroadcastReceiver : BroadcastReceiver() {
 
     private fun startPushService() {
         val intent = Intent(context, IMService::class.java)
-        intent.action = CIMPushManager.ACTION_ACTIVATE_PUSH_SERVICE
+        intent.action = IMManagerHelper.ACTION_ACTIVATE_PUSH_SERVICE
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             context.startForegroundService(intent)
         } else {
@@ -75,14 +75,14 @@ abstract class AbsIMEventBroadcastReceiver : BroadcastReceiver() {
 
     private fun onInnerConnectionClosed() {
         IMCacheHelper.putBoolean(context, IMCacheHelper.KEY_CIM_CONNECTION_STATE, false)
-        if (CIMPushManager.isNetworkConnected(context)) {
+        if (IMManagerHelper.isNetworkConnected(context)) {
             connect(0)
         }
         onConnectionClosed()
     }
 
     private fun onConnectionFailed(reInterval: Long) {
-        if (CIMPushManager.isNetworkConnected(context)) {
+        if (IMManagerHelper.isNetworkConnected(context)) {
             onConnectionFailed()
             connect(reInterval)
         }
@@ -90,12 +90,12 @@ abstract class AbsIMEventBroadcastReceiver : BroadcastReceiver() {
 
     private fun onInnerConnectionSuccess() {
         IMCacheHelper.putBoolean(context, IMCacheHelper.KEY_CIM_CONNECTION_STATE, true)
-        val autoBind = CIMPushManager.autoBindAccount(context)
+        val autoBind = IMManagerHelper.autoBindAccount(context)
         onConnectionSuccess(autoBind)
     }
 
     private fun onDevicesNetworkChanged() {
-        if (CIMPushManager.isNetworkConnected(context)) {
+        if (IMManagerHelper.isNetworkConnected(context)) {
             connect(0)
         }
         onNetworkChanged()
@@ -104,13 +104,13 @@ abstract class AbsIMEventBroadcastReceiver : BroadcastReceiver() {
     private fun connect(delay: Long) {
         val serviceIntent = Intent(context, IMService::class.java)
         serviceIntent.putExtra(IMService.KEY_DELAYED_TIME, delay)
-        serviceIntent.action = CIMPushManager.ACTION_CREATE_CONNECTION
-        CIMPushManager.startService(context, serviceIntent)
+        serviceIntent.action = IMManagerHelper.ACTION_CREATE_CONNECTION
+        IMManagerHelper.startService(context, serviceIntent)
     }
 
     private fun onInnerMessageReceived(message: Message, intent: Intent) {
         if (isForceOfflineMessage(message.action)) {
-            CIMPushManager.stop(context)
+            IMManagerHelper.stop(context)
         }
         onMessageReceived(message, intent)
     }
@@ -123,7 +123,7 @@ abstract class AbsIMEventBroadcastReceiver : BroadcastReceiver() {
     abstract fun onMessageReceived(message: Message, intent: Intent)
 
     open fun onNetworkChanged() {
-        IMListenerManager.notifyOnNetworkChanged(CIMPushManager.getNetworkInfo(context)!!)
+        IMListenerManager.notifyOnNetworkChanged(IMManagerHelper.getNetworkInfo(context)!!)
     }
 
     open fun onConnectionSuccess(hasAutoBind: Boolean) {

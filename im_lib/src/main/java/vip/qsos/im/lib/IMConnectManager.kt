@@ -6,9 +6,9 @@ import android.content.Intent
 import android.os.Handler
 import android.os.HandlerThread
 import android.os.Process
-import vip.qsos.im.lib.coder.ClientMessageDecoder
-import vip.qsos.im.lib.coder.ClientMessageEncoder
-import vip.qsos.im.lib.coder.LogUtils
+import vip.qsos.im.lib.coder.IMMessageDecoder
+import vip.qsos.im.lib.coder.IMMessageEncoder
+import vip.qsos.im.lib.coder.IMLogUtils
 import vip.qsos.im.lib.constant.IMConstant
 import vip.qsos.im.lib.model.*
 import java.io.IOException
@@ -64,8 +64,8 @@ class IMConnectManager private constructor(override val mContext: Context) : ICo
     override val mLastReadTime = AtomicLong(0)
     override val mSemaphore = Semaphore(1, true)
     override var mSocketChannel: SocketChannel? = null
-    override val mMessageEncoder: ClientMessageEncoder = ClientMessageEncoder()
-    override val mMessageDecoder: ClientMessageDecoder = ClientMessageDecoder()
+    override val mMessageEncoder: IMMessageEncoder = IMMessageEncoder()
+    override val mMessageDecoder: IMMessageDecoder = IMMessageDecoder()
     override var mReadBuffer: ByteBuffer = ByteBuffer.allocate(READ_BUFFER_SIZE)
     override val mSocketSendExecutor: ExecutorService = Executors.newFixedThreadPool(1) { r ->
         Thread(r, "SocketSend-")
@@ -76,7 +76,7 @@ class IMConnectManager private constructor(override val mContext: Context) : ICo
     override var isConnected: Boolean = false
         get() {
             field = mSocketChannel != null && mSocketChannel!!.isConnected
-            LogUtils.logger.connectState(field)
+            IMLogUtils.LOGGER.connectState(field)
             return field
         }
 
@@ -86,7 +86,7 @@ class IMConnectManager private constructor(override val mContext: Context) : ICo
     }
 
     override fun connect(host: String, port: Int) {
-        if (!CIMPushManager.isNetworkConnected(mContext)) {
+        if (!IMManagerHelper.isNetworkConnected(mContext)) {
             val intent = Intent()
             intent.setPackage(mContext.packageName)
             intent.action = IMConstant.IntentAction.ACTION_CONNECTION_FAILED
@@ -100,7 +100,7 @@ class IMConnectManager private constructor(override val mContext: Context) : ICo
             if (isConnected) {
                 return@Runnable
             }
-            LogUtils.logger.connectStart(host, port)
+            IMLogUtils.LOGGER.connectStart(host, port)
 
             IMCacheHelper.putBoolean(mContext, IMCacheHelper.KEY_CIM_CONNECTION_STATE, false)
             mSemaphore.acquire()
@@ -176,7 +176,7 @@ class IMConnectManager private constructor(override val mContext: Context) : ICo
                     result += mSocketChannel!!.write(buffer)
                 }
             } catch (e: Exception) {
-                LogUtils.logger.sendException(e)
+                IMLogUtils.LOGGER.sendException(e)
                 result = -1
             } finally {
                 mSemaphore.release()
@@ -190,7 +190,7 @@ class IMConnectManager private constructor(override val mContext: Context) : ICo
     }
 
     override fun channelCreated() {
-        LogUtils.logger.connectCreated(mSocketChannel!!)
+        IMLogUtils.LOGGER.connectCreated(mSocketChannel!!)
         mLastReadTime.set(System.currentTimeMillis())
         mConnectCloseHandler.sendEmptyMessageDelayed(0, CONNECT_READ_IDLE_TIME)
         val intent = Intent()
@@ -200,7 +200,7 @@ class IMConnectManager private constructor(override val mContext: Context) : ICo
     }
 
     override fun clearAll() {
-        LogUtils.logger.connectClosed(mSocketChannel!!)
+        IMLogUtils.LOGGER.connectClosed(mSocketChannel!!)
         mConnectCloseHandler.removeMessages(0)
         mLastReadTime.set(0)
         mReadBuffer.clear()
@@ -216,7 +216,7 @@ class IMConnectManager private constructor(override val mContext: Context) : ICo
 
     override fun checkAndCloseConnect() {
         val idle = System.currentTimeMillis() - mLastReadTime.get()
-        LogUtils.logger.connectReadIdle(mSocketChannel!!, idle)
+        IMLogUtils.LOGGER.connectReadIdle(mSocketChannel!!, idle)
         if (idle >= CONNECT_ALIVE_TIME_OUT) {
             /**当前时间距离最近一次通信的时间如果大于配置的连接活跃时间，则表明连接可能已断开，
              * 无论是否连接都应主动断开连接，以保证下次连接时成功*/
@@ -225,7 +225,7 @@ class IMConnectManager private constructor(override val mContext: Context) : ICo
     }
 
     override fun messageReceived(message: Any) {
-        LogUtils.logger.received(mSocketChannel!!, message)
+        IMLogUtils.LOGGER.received(mSocketChannel!!, message)
         when (message) {
             is HeartbeatRequest -> {
                 this.send(HeartbeatResponse.instance)
@@ -248,7 +248,7 @@ class IMConnectManager private constructor(override val mContext: Context) : ICo
     }
 
     override fun messageSentSuccess(message: Any) {
-        LogUtils.logger.sendSuccess(mSocketChannel!!, message)
+        IMLogUtils.LOGGER.sendSuccess(mSocketChannel!!, message)
         if (message is SendBody) {
             val intent = Intent()
             intent.setPackage(mContext.packageName)
@@ -259,7 +259,7 @@ class IMConnectManager private constructor(override val mContext: Context) : ICo
     }
 
     override fun messageSentFailed(message: Any) {
-        LogUtils.logger.sendFailed(mSocketChannel!!, message)
+        IMLogUtils.LOGGER.sendFailed(mSocketChannel!!, message)
         if (message is SendBody) {
             val intent = Intent()
             intent.setPackage(mContext.packageName)
@@ -274,7 +274,7 @@ class IMConnectManager private constructor(override val mContext: Context) : ICo
     }
 
     override fun handleConnectTimeoutEvent() {
-        LogUtils.logger.connectFailed(IMConstant.RECONNECT_INTERVAL_TIME)
+        IMLogUtils.LOGGER.connectFailed(IMConstant.RECONNECT_INTERVAL_TIME)
         val intent = Intent()
         intent.setPackage(mContext.packageName)
         intent.action = IMConstant.IntentAction.ACTION_CONNECTION_FAILED

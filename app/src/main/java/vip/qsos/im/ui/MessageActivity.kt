@@ -11,7 +11,7 @@ import kotlinx.android.synthetic.main.activity_system_chat.*
 import vip.qsos.im.adapter.SystemMsgListViewAdapter
 import vip.qsos.im.app.AbsIMActivity
 import vip.qsos.im.app.Constant
-import vip.qsos.im.lib.CIMPushManager
+import vip.qsos.im.lib.IMManagerHelper
 import vip.qsos.im.lib.model.Message
 import java.util.*
 
@@ -45,7 +45,7 @@ class MessageActivity : AbsIMActivity(), OnClickListener {
     override fun onMessageReceived(message: Message) {
         if (message.action == Constant.MessageAction.ACTION_999) {
             //返回登录页面，停止接受消息
-            CIMPushManager.stop(this)
+            IMManagerHelper.stop(this)
             Toast.makeText(this, "你被系统强制下线!", Toast.LENGTH_LONG).show()
             val intent = Intent(this, LoginActivity::class.java)
             startActivity(intent)
@@ -70,7 +70,7 @@ class MessageActivity : AbsIMActivity(), OnClickListener {
 
     override fun onBackPressed() {
         //返回登录页面，停止接受消息
-        CIMPushManager.stop(this)
+        IMManagerHelper.stop(this)
         startActivity(Intent(this, LoginActivity::class.java))
         super.onBackPressed()
     }

@@ -3,8 +3,8 @@ package vip.qsos.im.lib
 import android.content.Context
 import android.os.Handler
 import vip.qsos.im.lib.IMConnectManager.Companion.CONNECT_READ_IDLE_TIME
-import vip.qsos.im.lib.coder.ClientMessageDecoder
-import vip.qsos.im.lib.coder.ClientMessageEncoder
+import vip.qsos.im.lib.coder.IMMessageDecoder
+import vip.qsos.im.lib.coder.IMMessageEncoder
 import vip.qsos.im.lib.model.IProtobufAble
 import java.io.IOException
 import java.nio.ByteBuffer
@@ -26,9 +26,9 @@ interface IConnectManager {
     /**消息通道*/
     var mSocketChannel: SocketChannel?
     /**消息发送编码*/
-    val mMessageEncoder: ClientMessageEncoder
+    val mMessageEncoder: IMMessageEncoder
     /**消息接收编码*/
-    val mMessageDecoder: ClientMessageDecoder
+    val mMessageDecoder: IMMessageDecoder
     /**消息读取暂存*/
     var mReadBuffer: ByteBuffer
     /**消息服务发送线程*/

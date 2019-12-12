@@ -13,7 +13,7 @@ import java.nio.ByteBuffer
  * @author : 华清松
  * 服务端回执消息解码
  */
-class ClientMessageDecoder {
+class IMMessageDecoder {
 
     /**服务器消息解析*/
     fun decode(buffer: ByteBuffer): Any? {

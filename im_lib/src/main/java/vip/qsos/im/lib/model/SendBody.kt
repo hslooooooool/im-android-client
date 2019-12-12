@@ -19,7 +19,7 @@ class SendBody : IProtobufAble {
     /**发送时间*/
     var timestamp: Long = 0L
     /**发送数据集合*/
-    val data: Hashtable<String, String> = Hashtable()
+    private val data: Hashtable<String, String> = Hashtable()
 
     init {
         timestamp = System.currentTimeMillis()

@@ -14,7 +14,7 @@ import android.os.Build
 import android.os.Handler
 import android.os.IBinder
 import android.text.TextUtils
-import vip.qsos.im.lib.coder.LogUtils
+import vip.qsos.im.lib.coder.IMLogUtils
 import vip.qsos.im.lib.constant.IMConstant
 import vip.qsos.im.lib.model.SendBody
 
@@ -98,23 +98,23 @@ class IMService : Service() {
                 .build()
             startForeground(NOTIFICATION_ID, notification)
         }
-        val mIntent: Intent = intent ?: Intent(CIMPushManager.ACTION_ACTIVATE_PUSH_SERVICE)
+        val mIntent: Intent = intent ?: Intent(IMManagerHelper.ACTION_ACTIVATE_PUSH_SERVICE)
         when (mIntent.action) {
-            CIMPushManager.ACTION_CREATE_CONNECTION -> {
+            IMManagerHelper.ACTION_CREATE_CONNECTION -> {
                 this.delayConnect(mIntent.getLongExtra(KEY_DELAYED_TIME, 0))
             }
-            CIMPushManager.ACTION_SEND_REQUEST_BODY -> {
-                mConnectManager.send(mIntent.getSerializableExtra(CIMPushManager.KEY_SEND_BODY) as SendBody)
+            IMManagerHelper.ACTION_SEND_REQUEST_BODY -> {
+                mConnectManager.send(mIntent.getSerializableExtra(IMManagerHelper.KEY_SEND_BODY) as SendBody)
             }
-            CIMPushManager.ACTION_CLOSE_CONNECTION -> {
+            IMManagerHelper.ACTION_CLOSE_CONNECTION -> {
                 mConnectManager.closeConnect()
             }
-            CIMPushManager.ACTION_ACTIVATE_PUSH_SERVICE -> {
+            IMManagerHelper.ACTION_ACTIVATE_PUSH_SERVICE -> {
                 this.handleKeepAlive()
             }
-            CIMPushManager.ACTION_SET_LOGGER_ENABLE -> {
+            IMManagerHelper.ACTION_SET_LOGGER_ENABLE -> {
                 val enable = mIntent.getBooleanExtra(KEY_LOGGER_ENABLE, true)
-                LogUtils.logger.open(enable)
+                IMLogUtils.LOGGER.open(enable)
             }
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -137,14 +137,14 @@ class IMService : Service() {
 
     /**连接消息服务器*/
     private fun connect() {
-        if (CIMPushManager.isDestroyed(this) || CIMPushManager.isStop(this)) {
-            LogUtils.logger.connectState(false)
+        if (IMManagerHelper.isDestroyed(this) || IMManagerHelper.isStop(this)) {
+            IMLogUtils.LOGGER.connectState(false)
             return
         }
         val host = IMCacheHelper.getString(this, IMCacheHelper.KEY_IM_SERVER_HOST)
         val port = IMCacheHelper.getInt(this, IMCacheHelper.KEY_IM_SERVER_PORT)
         if (TextUtils.isEmpty(host) || port <= 0) {
-            LogUtils.logger.invalidHostPort(host, port)
+            IMLogUtils.LOGGER.invalidHostPort(host, port)
         } else {
             mConnectManager.connect(host!!, port)
         }

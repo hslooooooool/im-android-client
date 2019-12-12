@@ -13,15 +13,15 @@ import com.farsunset.ichat.example.R
 
 import vip.qsos.im.app.AbsIMActivity
 import vip.qsos.im.app.Constant
-import vip.qsos.im.lib.CIMPushManager
+import vip.qsos.im.lib.IMManagerHelper
 
 class SplashActivity : AbsIMActivity() {
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        CIMPushManager.setLoggerEnable(this, BuildConfig.DEBUG)
-        CIMPushManager.connect(
+        IMManagerHelper.setLoggerEnable(this, BuildConfig.DEBUG)
+        IMManagerHelper.connect(
             this@SplashActivity,
             Constant.CIM_SERVER_HOST,
             Constant.CIM_SERVER_PORT
@@ -39,7 +39,7 @@ class SplashActivity : AbsIMActivity() {
 
     override fun onBackPressed() {
         finish()
-        CIMPushManager.destroy(this)
+        IMManagerHelper.destroy(this)
     }
 
     override fun onConnectionFailed() {
