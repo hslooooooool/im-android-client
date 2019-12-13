@@ -1,7 +1,7 @@
 package vip.qsos.im.lib.model
 
 import vip.qsos.im.lib.constant.IMConstant
-import vip.qsos.im.lib.model.proto.SentBodyProto
+import vip.qsos.im.lib.model.proto.SendBodyProto
 import java.util.*
 
 /**
@@ -49,7 +49,7 @@ class SendBody : IProtobufAble {
 
     override val byteArray: ByteArray
         get() {
-            val builder = SentBodyProto.Model.newBuilder()
+            val builder = SendBodyProto.Model.newBuilder()
             builder.key = key
             builder.timestamp = timestamp
             if (!data.isEmpty) {

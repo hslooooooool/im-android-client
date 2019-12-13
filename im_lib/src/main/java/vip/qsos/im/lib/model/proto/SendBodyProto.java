@@ -3,8 +3,8 @@
 
 package vip.qsos.im.lib.model.proto;
 
-public final class SentBodyProto {
-    private SentBodyProto() {
+public final class SendBodyProto {
+    private SendBodyProto() {
     }
 
     public static void registerAllExtensions(
@@ -12,31 +12,57 @@ public final class SentBodyProto {
     }
 
     public interface ModelOrBuilder extends
-            // @@protoc_insertion_point(interface_extends:Model)
+            // @@protoc_insertion_point(interface_extends:vip.qsos.im.lib.model.proto.Model)
             com.google.protobuf.MessageLiteOrBuilder {
 
         /**
-         * <code>optional string key = 1;</code>
+         * <pre>
+         * *发送key
+         * </pre>
+         *
+         * <code>string key = 1;</code>
+         *
+         * @return The key.
          */
         String getKey();
 
         /**
-         * <code>optional string key = 1;</code>
+         * <pre>
+         * *发送key
+         * </pre>
+         *
+         * <code>string key = 1;</code>
+         *
+         * @return The bytes for key.
          */
         com.google.protobuf.ByteString
         getKeyBytes();
 
         /**
-         * <code>optional int64 timestamp = 2;</code>
+         * <pre>
+         * *发送时间
+         * </pre>
+         *
+         * <code>int64 timestamp = 2;</code>
+         *
+         * @return The timestamp.
          */
         long getTimestamp();
 
         /**
+         * <pre>
+         * *发送数据集合
+         * </pre>
+         *
          * <code>map&lt;string, string&gt; data = 3;</code>
          */
         int getDataCount();
 
         /**
+         * <pre>
+         * *发送数据集合
+         * </pre>
+         *
          * <code>map&lt;string, string&gt; data = 3;</code>
          */
         boolean containsData(
@@ -50,12 +76,20 @@ public final class SentBodyProto {
         getData();
 
         /**
+         * <pre>
+         * *发送数据集合
+         * </pre>
+         *
          * <code>map&lt;string, string&gt; data = 3;</code>
          */
         java.util.Map<String, String>
         getDataMap();
 
         /**
+         * <pre>
+         * *发送数据集合
+         * </pre>
+         *
          * <code>map&lt;string, string&gt; data = 3;</code>
          */
 
@@ -64,6 +98,10 @@ public final class SentBodyProto {
                 String defaultValue);
 
         /**
+         * <pre>
+         * *发送数据集合
+         * </pre>
+         *
          * <code>map&lt;string, string&gt; data = 3;</code>
          */
 
@@ -72,23 +110,32 @@ public final class SentBodyProto {
     }
 
     /**
-     * Protobuf type {@code Model}
+     * <pre>
+     * 客户端发送实体
+     * </pre>
+     * <p>
+     * Protobuf type {@code vip.qsos.im.lib.model.proto.Model}
      */
     public static final class Model extends
             com.google.protobuf.GeneratedMessageLite<
                     Model, Model.Builder> implements
-            // @@protoc_insertion_point(message_implements:Model)
+            // @@protoc_insertion_point(message_implements:vip.qsos.im.lib.model.proto.Model)
             ModelOrBuilder {
         private Model() {
             key_ = "";
         }
 
-        private int bitField0_;
         public static final int KEY_FIELD_NUMBER = 1;
         private String key_;
 
         /**
-         * <code>optional string key = 1;</code>
+         * <pre>
+         * *发送key
+         * </pre>
+         *
+         * <code>string key = 1;</code>
+         *
+         * @return The key.
          */
         @Override
         public String getKey() {
@@ -96,7 +143,13 @@ public final class SentBodyProto {
         }
 
         /**
-         * <code>optional string key = 1;</code>
+         * <pre>
+         * *发送key
+         * </pre>
+         *
+         * <code>string key = 1;</code>
+         *
+         * @return The bytes for key.
          */
         @Override
         public com.google.protobuf.ByteString
@@ -105,19 +158,27 @@ public final class SentBodyProto {
         }
 
         /**
-         * <code>optional string key = 1;</code>
+         * <pre>
+         * *发送key
+         * </pre>
+         *
+         * <code>string key = 1;</code>
+         *
+         * @param value The key to set.
          */
         private void setKey(
                 String value) {
-            if (value == null) {
-                throw new NullPointerException();
-            }
+            value.getClass();
 
             key_ = value;
         }
 
         /**
-         * <code>optional string key = 1;</code>
+         * <pre>
+         * *发送key
+         * </pre>
+         *
+         * <code>string key = 1;</code>
          */
         private void clearKey() {
 
@@ -125,23 +186,32 @@ public final class SentBodyProto {
         }
 
         /**
-         * <code>optional string key = 1;</code>
+         * <pre>
+         * *发送key
+         * </pre>
+         *
+         * <code>string key = 1;</code>
+         *
+         * @param value The bytes for key to set.
          */
         private void setKeyBytes(
                 com.google.protobuf.ByteString value) {
-            if (value == null) {
-                throw new NullPointerException();
-            }
             checkByteStringIsUtf8(value);
-
             key_ = value.toStringUtf8();
+
         }
 
         public static final int TIMESTAMP_FIELD_NUMBER = 2;
         private long timestamp_;
 
         /**
-         * <code>optional int64 timestamp = 2;</code>
+         * <pre>
+         * *发送时间
+         * </pre>
+         *
+         * <code>int64 timestamp = 2;</code>
+         *
+         * @return The timestamp.
          */
         @Override
         public long getTimestamp() {
@@ -149,7 +219,13 @@ public final class SentBodyProto {
         }
 
         /**
-         * <code>optional int64 timestamp = 2;</code>
+         * <pre>
+         * *发送时间
+         * </pre>
+         *
+         * <code>int64 timestamp = 2;</code>
+         *
+         * @param value The timestamp to set.
          */
         private void setTimestamp(long value) {
 
@@ -157,7 +233,11 @@ public final class SentBodyProto {
         }
 
         /**
-         * <code>optional int64 timestamp = 2;</code>
+         * <pre>
+         * *发送时间
+         * </pre>
+         *
+         * <code>int64 timestamp = 2;</code>
          */
         private void clearTimestamp() {
 
@@ -195,20 +275,23 @@ public final class SentBodyProto {
         }
 
         @Override
+
         public int getDataCount() {
             return internalGetData().size();
         }
 
         /**
+         * <pre>
+         * *发送数据集合
+         * </pre>
+         *
          * <code>map&lt;string, string&gt; data = 3;</code>
          */
-
         @Override
+
         public boolean containsData(
                 String key) {
-            if (key == null) {
-                throw new NullPointerException();
-            }
+            key.getClass();
             return internalGetData().containsKey(key);
         }
 
@@ -222,41 +305,49 @@ public final class SentBodyProto {
         }
 
         /**
+         * <pre>
+         * *发送数据集合
+         * </pre>
+         *
          * <code>map&lt;string, string&gt; data = 3;</code>
          */
-
         @Override
+
         public java.util.Map<String, String> getDataMap() {
             return java.util.Collections.unmodifiableMap(
                     internalGetData());
         }
 
         /**
+         * <pre>
+         * *发送数据集合
+         * </pre>
+         *
          * <code>map&lt;string, string&gt; data = 3;</code>
          */
-
         @Override
+
         public String getDataOrDefault(
                 String key,
                 String defaultValue) {
-            if (key == null) {
-                throw new NullPointerException();
-            }
+            key.getClass();
             java.util.Map<String, String> map =
                     internalGetData();
             return map.containsKey(key) ? map.get(key) : defaultValue;
         }
 
         /**
+         * <pre>
+         * *发送数据集合
+         * </pre>
+         *
          * <code>map&lt;string, string&gt; data = 3;</code>
          */
-
         @Override
+
         public String getDataOrThrow(
                 String key) {
-            if (key == null) {
-                throw new NullPointerException();
-            }
+            key.getClass();
             java.util.Map<String, String> map =
                     internalGetData();
             if (!map.containsKey(key)) {
@@ -266,6 +357,10 @@ public final class SentBodyProto {
         }
 
         /**
+         * <pre>
+         * *发送数据集合
+         * </pre>
+         *
          * <code>map&lt;string, string&gt; data = 3;</code>
          */
         private java.util.Map<String, String>
@@ -273,55 +368,29 @@ public final class SentBodyProto {
             return internalGetMutableData();
         }
 
-        @Override
-        public void writeTo(com.google.protobuf.CodedOutputStream output)
-                throws java.io.IOException {
-            if (!key_.isEmpty()) {
-                output.writeString(1, getKey());
-            }
-            if (timestamp_ != 0L) {
-                output.writeInt64(2, timestamp_);
-            }
-            for (java.util.Map.Entry<String, String> entry
-                    : internalGetData().entrySet()) {
-                DataDefaultEntryHolder.defaultEntry.serializeTo(
-                        output, 3, entry.getKey(), entry.getValue());
-            }
+        public static Model parseFrom(
+                java.nio.ByteBuffer data)
+                throws com.google.protobuf.InvalidProtocolBufferException {
+            return com.google.protobuf.GeneratedMessageLite.parseFrom(
+                    DEFAULT_INSTANCE, data);
         }
 
-        @Override
-        public int getSerializedSize() {
-            int size = memoizedSerializedSize;
-            if (size != -1) {
-                return size;
-            }
-
-            size = 0;
-            if (!key_.isEmpty()) {
-                size += com.google.protobuf.CodedOutputStream
-                        .computeStringSize(1, getKey());
-            }
-            if (timestamp_ != 0L) {
-                size += com.google.protobuf.CodedOutputStream
-                        .computeInt64Size(2, timestamp_);
-            }
-            for (java.util.Map.Entry<String, String> entry
-                    : internalGetData().entrySet()) {
-                size += DataDefaultEntryHolder.defaultEntry.computeMessageSize(
-                        3, entry.getKey(), entry.getValue());
-            }
-            memoizedSerializedSize = size;
-            return size;
+        public static Model parseFrom(
+                java.nio.ByteBuffer data,
+                com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+                throws com.google.protobuf.InvalidProtocolBufferException {
+            return com.google.protobuf.GeneratedMessageLite.parseFrom(
+                    DEFAULT_INSTANCE, data, extensionRegistry);
         }
 
-        public static SentBodyProto.Model parseFrom(
+        public static Model parseFrom(
                 com.google.protobuf.ByteString data)
                 throws com.google.protobuf.InvalidProtocolBufferException {
             return com.google.protobuf.GeneratedMessageLite.parseFrom(
                     DEFAULT_INSTANCE, data);
         }
 
-        public static SentBodyProto.Model parseFrom(
+        public static Model parseFrom(
                 com.google.protobuf.ByteString data,
                 com.google.protobuf.ExtensionRegistryLite extensionRegistry)
                 throws com.google.protobuf.InvalidProtocolBufferException {
@@ -329,13 +398,13 @@ public final class SentBodyProto {
                     DEFAULT_INSTANCE, data, extensionRegistry);
         }
 
-        public static SentBodyProto.Model parseFrom(byte[] data)
+        public static Model parseFrom(byte[] data)
                 throws com.google.protobuf.InvalidProtocolBufferException {
             return com.google.protobuf.GeneratedMessageLite.parseFrom(
                     DEFAULT_INSTANCE, data);
         }
 
-        public static SentBodyProto.Model parseFrom(
+        public static Model parseFrom(
                 byte[] data,
                 com.google.protobuf.ExtensionRegistryLite extensionRegistry)
                 throws com.google.protobuf.InvalidProtocolBufferException {
@@ -343,13 +412,13 @@ public final class SentBodyProto {
                     DEFAULT_INSTANCE, data, extensionRegistry);
         }
 
-        public static SentBodyProto.Model parseFrom(java.io.InputStream input)
+        public static Model parseFrom(java.io.InputStream input)
                 throws java.io.IOException {
             return com.google.protobuf.GeneratedMessageLite.parseFrom(
                     DEFAULT_INSTANCE, input);
         }
 
-        public static SentBodyProto.Model parseFrom(
+        public static Model parseFrom(
                 java.io.InputStream input,
                 com.google.protobuf.ExtensionRegistryLite extensionRegistry)
                 throws java.io.IOException {
@@ -357,26 +426,26 @@ public final class SentBodyProto {
                     DEFAULT_INSTANCE, input, extensionRegistry);
         }
 
-        public static SentBodyProto.Model parseDelimitedFrom(java.io.InputStream input)
+        public static Model parseDelimitedFrom(java.io.InputStream input)
                 throws java.io.IOException {
             return parseDelimitedFrom(DEFAULT_INSTANCE, input);
         }
 
-        public static SentBodyProto.Model parseDelimitedFrom(
+        public static Model parseDelimitedFrom(
                 java.io.InputStream input,
                 com.google.protobuf.ExtensionRegistryLite extensionRegistry)
                 throws java.io.IOException {
             return parseDelimitedFrom(DEFAULT_INSTANCE, input, extensionRegistry);
         }
 
-        public static SentBodyProto.Model parseFrom(
+        public static Model parseFrom(
                 com.google.protobuf.CodedInputStream input)
                 throws java.io.IOException {
             return com.google.protobuf.GeneratedMessageLite.parseFrom(
                     DEFAULT_INSTANCE, input);
         }
 
-        public static SentBodyProto.Model parseFrom(
+        public static Model parseFrom(
                 com.google.protobuf.CodedInputStream input,
                 com.google.protobuf.ExtensionRegistryLite extensionRegistry)
                 throws java.io.IOException {
@@ -385,29 +454,39 @@ public final class SentBodyProto {
         }
 
         public static Builder newBuilder() {
-            return DEFAULT_INSTANCE.toBuilder();
+            return (Builder) DEFAULT_INSTANCE.createBuilder();
         }
 
-        public static Builder newBuilder(SentBodyProto.Model prototype) {
-            return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+        public static Builder newBuilder(Model prototype) {
+            return (Builder) DEFAULT_INSTANCE.createBuilder(prototype);
         }
 
         /**
-         * Protobuf type {@code Model}
+         * <pre>
+         * 客户端发送实体
+         * </pre>
+         * <p>
+         * Protobuf type {@code vip.qsos.im.lib.model.proto.Model}
          */
         public static final class Builder extends
                 com.google.protobuf.GeneratedMessageLite.Builder<
-                        SentBodyProto.Model, Builder> implements
-                // @@protoc_insertion_point(builder_implements:Model)
-                SentBodyProto.ModelOrBuilder {
-            // Construct using SentBodyProto.Model.newBuilder()
+                        Model, Builder> implements
+                // @@protoc_insertion_point(builder_implements:vip.qsos.im.lib.model.proto.Model)
+                ModelOrBuilder {
+            // Construct using vip.qsos.im.lib.model.proto.SendBodyProto.Model.newBuilder()
             private Builder() {
                 super(DEFAULT_INSTANCE);
             }
 
 
             /**
-             * <code>optional string key = 1;</code>
+             * <pre>
+             * *发送key
+             * </pre>
+             *
+             * <code>string key = 1;</code>
+             *
+             * @return The key.
              */
             @Override
             public String getKey() {
@@ -415,7 +494,13 @@ public final class SentBodyProto {
             }
 
             /**
-             * <code>optional string key = 1;</code>
+             * <pre>
+             * *发送key
+             * </pre>
+             *
+             * <code>string key = 1;</code>
+             *
+             * @return The bytes for key.
              */
             @Override
             public com.google.protobuf.ByteString
@@ -424,7 +509,14 @@ public final class SentBodyProto {
             }
 
             /**
-             * <code>optional string key = 1;</code>
+             * <pre>
+             * *发送key
+             * </pre>
+             *
+             * <code>string key = 1;</code>
+             *
+             * @param value The key to set.
+             * @return This builder for chaining.
              */
             public Builder setKey(
                     String value) {
@@ -434,7 +526,13 @@ public final class SentBodyProto {
             }
 
             /**
-             * <code>optional string key = 1;</code>
+             * <pre>
+             * *发送key
+             * </pre>
+             *
+             * <code>string key = 1;</code>
+             *
+             * @return This builder for chaining.
              */
             public Builder clearKey() {
                 copyOnWrite();
@@ -443,7 +541,14 @@ public final class SentBodyProto {
             }
 
             /**
-             * <code>optional string key = 1;</code>
+             * <pre>
+             * *发送key
+             * </pre>
+             *
+             * <code>string key = 1;</code>
+             *
+             * @param value The bytes for key to set.
+             * @return This builder for chaining.
              */
             public Builder setKeyBytes(
                     com.google.protobuf.ByteString value) {
@@ -453,7 +558,13 @@ public final class SentBodyProto {
             }
 
             /**
-             * <code>optional int64 timestamp = 2;</code>
+             * <pre>
+             * *发送时间
+             * </pre>
+             *
+             * <code>int64 timestamp = 2;</code>
+             *
+             * @return The timestamp.
              */
             @Override
             public long getTimestamp() {
@@ -461,7 +572,14 @@ public final class SentBodyProto {
             }
 
             /**
-             * <code>optional int64 timestamp = 2;</code>
+             * <pre>
+             * *发送时间
+             * </pre>
+             *
+             * <code>int64 timestamp = 2;</code>
+             *
+             * @param value The timestamp to set.
+             * @return This builder for chaining.
              */
             public Builder setTimestamp(long value) {
                 copyOnWrite();
@@ -470,7 +588,13 @@ public final class SentBodyProto {
             }
 
             /**
-             * <code>optional int64 timestamp = 2;</code>
+             * <pre>
+             * *发送时间
+             * </pre>
+             *
+             * <code>int64 timestamp = 2;</code>
+             *
+             * @return This builder for chaining.
              */
             public Builder clearTimestamp() {
                 copyOnWrite();
@@ -478,22 +602,24 @@ public final class SentBodyProto {
                 return this;
             }
 
-
             @Override
+
             public int getDataCount() {
                 return instance.getDataMap().size();
             }
 
             /**
+             * <pre>
+             * *发送数据集合
+             * </pre>
+             *
              * <code>map&lt;string, string&gt; data = 3;</code>
              */
-
             @Override
+
             public boolean containsData(
                     String key) {
-                if (key == null) {
-                    throw new NullPointerException();
-                }
+                key.getClass();
                 return instance.getDataMap().containsKey(key);
             }
 
@@ -504,14 +630,16 @@ public final class SentBodyProto {
             }
 
             /**
+             * <pre>
+             * *发送数据集合
+             * </pre>
+             *
              * <code>map&lt;string, string&gt; data = 3;</code>
              */
 
             public Builder removeData(
                     String key) {
-                if (key == null) {
-                    throw new NullPointerException();
-                }
+                key.getClass();
                 copyOnWrite();
                 instance.getMutableDataMap().remove(key);
                 return this;
@@ -527,6 +655,10 @@ public final class SentBodyProto {
             }
 
             /**
+             * <pre>
+             * *发送数据集合
+             * </pre>
+             *
              * <code>map&lt;string, string&gt; data = 3;</code>
              */
             @Override
@@ -536,31 +668,35 @@ public final class SentBodyProto {
             }
 
             /**
+             * <pre>
+             * *发送数据集合
+             * </pre>
+             *
              * <code>map&lt;string, string&gt; data = 3;</code>
              */
-
             @Override
+
             public String getDataOrDefault(
                     String key,
                     String defaultValue) {
-                if (key == null) {
-                    throw new NullPointerException();
-                }
+                key.getClass();
                 java.util.Map<String, String> map =
                         instance.getDataMap();
                 return map.containsKey(key) ? map.get(key) : defaultValue;
             }
 
             /**
+             * <pre>
+             * *发送数据集合
+             * </pre>
+             *
              * <code>map&lt;string, string&gt; data = 3;</code>
              */
-
             @Override
+
             public String getDataOrThrow(
                     String key) {
-                if (key == null) {
-                    throw new NullPointerException();
-                }
+                key.getClass();
                 java.util.Map<String, String> map =
                         instance.getDataMap();
                 if (!map.containsKey(key)) {
@@ -570,23 +706,27 @@ public final class SentBodyProto {
             }
 
             /**
+             * <pre>
+             * *发送数据集合
+             * </pre>
+             *
              * <code>map&lt;string, string&gt; data = 3;</code>
              */
             public Builder putData(
                     String key,
                     String value) {
-                if (key == null) {
-                    throw new NullPointerException();
-                }
-                if (value == null) {
-                    throw new NullPointerException();
-                }
+                key.getClass();
+                value.getClass();
                 copyOnWrite();
                 instance.getMutableDataMap().put(key, value);
                 return this;
             }
 
             /**
+             * <pre>
+             * *发送数据集合
+             * </pre>
+             *
              * <code>map&lt;string, string&gt; data = 3;</code>
              */
             public Builder putAllData(
@@ -596,119 +736,76 @@ public final class SentBodyProto {
                 return this;
             }
 
-            // @@protoc_insertion_point(builder_scope:Model)
+            // @@protoc_insertion_point(builder_scope:vip.qsos.im.lib.model.proto.Model)
         }
 
         @Override
+        @SuppressWarnings({"unchecked", "fallthrough"})
         protected final Object dynamicMethod(
-                com.google.protobuf.GeneratedMessageLite.MethodToInvoke method,
+                MethodToInvoke method,
                 Object arg0, Object arg1) {
             switch (method) {
                 case NEW_MUTABLE_INSTANCE: {
-                    return new SentBodyProto.Model();
-                }
-                case IS_INITIALIZED: {
-                    return DEFAULT_INSTANCE;
-                }
-                case MAKE_IMMUTABLE: {
-                    data_.makeImmutable();
-                    return null;
+                    return new Model();
                 }
                 case NEW_BUILDER: {
                     return new Builder();
                 }
-                case VISIT: {
-                    Visitor visitor = (Visitor) arg0;
-                    SentBodyProto.Model other = (SentBodyProto.Model) arg1;
-                    key_ = visitor.visitString(!key_.isEmpty(), key_,
-                            !other.key_.isEmpty(), other.key_);
-                    timestamp_ = visitor.visitLong(timestamp_ != 0L, timestamp_,
-                            other.timestamp_ != 0L, other.timestamp_);
-                    data_ = visitor.visitMap(
-                            data_, other.internalGetData());
-                    if (visitor == com.google.protobuf.GeneratedMessageLite.MergeFromVisitor
-                            .INSTANCE) {
-                        bitField0_ |= other.bitField0_;
-                    }
-                    return this;
+                case BUILD_MESSAGE_INFO: {
+                    Object[] objects = new Object[]{
+                            "key_",
+                            "timestamp_",
+                            "data_",
+                            DataDefaultEntryHolder.defaultEntry,
+                    };
+                    String info =
+                            "\u0000\u0003\u0000\u0000\u0001\u0003\u0003\u0001\u0000\u0000\u0001\u0208\u0002\u0002" +
+                                    "\u00032";
+                    return newMessageInfo(DEFAULT_INSTANCE, info, objects);
                 }
-                case MERGE_FROM_STREAM: {
-                    com.google.protobuf.CodedInputStream input =
-                            (com.google.protobuf.CodedInputStream) arg0;
-                    com.google.protobuf.ExtensionRegistryLite extensionRegistry =
-                            (com.google.protobuf.ExtensionRegistryLite) arg1;
-                    try {
-                        boolean done = false;
-                        while (!done) {
-                            int tag = input.readTag();
-                            switch (tag) {
-                                case 0:
-                                    done = true;
-                                    break;
-                                default: {
-                                    if (!input.skipField(tag)) {
-                                        done = true;
-                                    }
-                                    break;
-                                }
-                                case 10: {
-                                    String s = input.readStringRequireUtf8();
-
-                                    key_ = s;
-                                    break;
-                                }
-                                case 16: {
-
-                                    timestamp_ = input.readInt64();
-                                    break;
-                                }
-                                case 26: {
-                                    if (!data_.isMutable()) {
-                                        data_ = data_.mutableCopy();
-                                    }
-                                    DataDefaultEntryHolder.defaultEntry.parseInto(data_, input, extensionRegistry);
-                                    break;
-                                }
-                            }
-                        }
-                    } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-                        throw new RuntimeException(e.setUnfinishedMessage(this));
-                    } catch (java.io.IOException e) {
-                        throw new RuntimeException(
-                                new com.google.protobuf.InvalidProtocolBufferException(
-                                        e.getMessage()).setUnfinishedMessage(this));
-                    } finally {
-                    }
-                }
+                // fall through
                 case GET_DEFAULT_INSTANCE: {
                     return DEFAULT_INSTANCE;
                 }
                 case GET_PARSER: {
-                    if (PARSER == null) {
-                        synchronized (SentBodyProto.Model.class) {
-                            if (PARSER == null) {
-                                PARSER = new DefaultInstanceBasedParser(DEFAULT_INSTANCE);
+                    com.google.protobuf.Parser<Model> parser = PARSER;
+                    if (parser == null) {
+                        synchronized (Model.class) {
+                            parser = PARSER;
+                            if (parser == null) {
+                                parser =
+                                        new DefaultInstanceBasedParser<Model>(
+                                                DEFAULT_INSTANCE);
+                                PARSER = parser;
                             }
                         }
                     }
-                    return PARSER;
+                    return parser;
                 }
-                default:
-                    break;
+                case GET_MEMOIZED_IS_INITIALIZED: {
+                    return (byte) 1;
+                }
+                case SET_MEMOIZED_IS_INITIALIZED: {
+                    return null;
+                }
             }
             throw new UnsupportedOperationException();
         }
 
 
-        // @@protoc_insertion_point(class_scope:Model)
-        private static final SentBodyProto.Model DEFAULT_INSTANCE;
+        // @@protoc_insertion_point(class_scope:vip.qsos.im.lib.model.proto.Model)
+        private static final Model DEFAULT_INSTANCE;
 
         static {
-            DEFAULT_INSTANCE = new Model();
-            DEFAULT_INSTANCE.makeImmutable();
+            Model defaultInstance = new Model();
+            // New instances are implicitly immutable so no need to make
+            // immutable.
+            DEFAULT_INSTANCE = defaultInstance;
+            com.google.protobuf.GeneratedMessageLite.registerDefaultInstance(
+                    Model.class, defaultInstance);
         }
 
-        public static SentBodyProto.Model getDefaultInstance() {
+        public static Model getDefaultInstance() {
             return DEFAULT_INSTANCE;
         }
 
