@@ -6,7 +6,7 @@ import java.util.*
 
 /**
  * @author : 华清松
- * 客户端请求对象
+ * 客户端发送的消息
  */
 class SendBody : IProtobufAble {
 
@@ -52,7 +52,7 @@ class SendBody : IProtobufAble {
             val builder = SendBodyProto.Model.newBuilder()
             builder.key = key
             builder.timestamp = timestamp
-            if (!data.isEmpty) {
+            if (data.isNotEmpty()) {
                 builder.putAllData(data)
             }
             return builder.build().toByteArray()

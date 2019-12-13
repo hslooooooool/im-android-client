@@ -42,8 +42,8 @@ interface IMConstant {
 
     interface RequestKey {
         companion object {
-            const val CLIENT_BIND = "client_bind"
-            const val CLIENT_LOGOUT = "client_logout"
+            const val CLIENT_BIND = "CLIENT_BIND"
+            const val CLIENT_LOGOUT = "CLIENT_LOGOUT"
         }
     }
 

@@ -11,7 +11,7 @@ import java.nio.ByteBuffer
 
 /**
  * @author : 华清松
- * 服务端回执消息解码
+ * 服务端发送的消息解码
  */
 class IMMessageDecoder {
 
@@ -31,7 +31,7 @@ class IMMessageDecoder {
         /**获取到消息体长度*/
         val length = getContentLength(lv.toInt(), hv.toInt())
 
-        // 消息体没有接收完整，则重置读取，等待下一次重新读取
+        /**消息体没有接收完整，则重置读取，等待下一次重新读取*/
         if (length > buffer.remaining()) {
             buffer.reset()
             return null

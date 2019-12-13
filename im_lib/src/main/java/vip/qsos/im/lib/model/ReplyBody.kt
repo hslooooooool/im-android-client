@@ -5,7 +5,7 @@ import java.util.*
 
 /**
  * @author : 华清松
- * 服务器应答对象，客户端主动请求服务器后才会收到回执消息
+ * 服务器应答对象，客户端主动请求服务器后收到的回执消息
  */
 class ReplyBody : Serializable {
 
