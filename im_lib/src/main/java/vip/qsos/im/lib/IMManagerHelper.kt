@@ -160,7 +160,7 @@ object IMManagerHelper {
 
     /**判断消息服务已连接*/
     fun isConnected(context: Context): Boolean {
-        return IMCacheHelper.getBoolean(context, IMCacheHelper.KEY_CIM_CONNECTION_STATE)
+        return IMCacheHelper.getBoolean(context, IMCacheHelper.KEY_IM_CONNECTION_STATE)
     }
 
     /**判断网络已连接*/

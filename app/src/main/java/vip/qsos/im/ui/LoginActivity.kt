@@ -6,10 +6,10 @@ import android.os.Bundle
 import android.text.TextUtils
 import android.view.View
 import android.view.View.OnClickListener
-import com.farsunset.ichat.example.R
 import kotlinx.android.synthetic.main.activity_login.*
 import vip.qsos.im.app.AbsIMActivity
 import vip.qsos.im.app.Constant
+import vip.qsos.im.demo.R
 import vip.qsos.im.lib.IMManagerHelper
 import vip.qsos.im.lib.constant.IMConstant
 import vip.qsos.im.lib.model.ReplyBody
@@ -20,7 +20,7 @@ import vip.qsos.im.lib.model.ReplyBody
  */
 class LoginActivity : AbsIMActivity(), OnClickListener {
 
-    lateinit var progressDialog: ProgressDialog
+    private lateinit var progressDialog: ProgressDialog
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,7 +44,7 @@ class LoginActivity : AbsIMActivity(), OnClickListener {
             if (IMManagerHelper.isConnected(this)) {
                 IMManagerHelper.bindAccount(this, account)
             } else {
-                IMManagerHelper.connect(this, Constant.CIM_SERVER_HOST, Constant.CIM_SERVER_PORT)
+                IMManagerHelper.connect(this, Constant.IM_SERVER_HOST, Constant.IM_SERVER_PORT)
             }
         }
     }

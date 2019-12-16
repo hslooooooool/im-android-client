@@ -102,7 +102,7 @@ class IMConnectManager private constructor(override val mContext: Context) : ICo
             }
             IMLogUtils.LOGGER.connectStart(host, port)
 
-            IMCacheHelper.putBoolean(mContext, IMCacheHelper.KEY_CIM_CONNECTION_STATE, false)
+            IMCacheHelper.putBoolean(mContext, IMCacheHelper.KEY_IM_CONNECTION_STATE, false)
             mSemaphore.acquire()
             try {
                 mSocketChannel = SocketChannel.open()

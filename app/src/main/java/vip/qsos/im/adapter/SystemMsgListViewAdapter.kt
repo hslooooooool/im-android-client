@@ -6,8 +6,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseAdapter
-import com.farsunset.ichat.example.R
 import kotlinx.android.synthetic.main.item_chat_sysmsg.view.*
+import vip.qsos.im.demo.R
 import vip.qsos.im.lib.model.Message
 import java.text.SimpleDateFormat
 import java.util.*

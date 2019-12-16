@@ -74,7 +74,7 @@ abstract class AbsIMEventBroadcastReceiver : BroadcastReceiver() {
     }
 
     private fun onInnerConnectionClosed() {
-        IMCacheHelper.putBoolean(context, IMCacheHelper.KEY_CIM_CONNECTION_STATE, false)
+        IMCacheHelper.putBoolean(context, IMCacheHelper.KEY_IM_CONNECTION_STATE, false)
         if (IMManagerHelper.isNetworkConnected(context)) {
             connect(0)
         }
@@ -89,7 +89,7 @@ abstract class AbsIMEventBroadcastReceiver : BroadcastReceiver() {
     }
 
     private fun onInnerConnectionSuccess() {
-        IMCacheHelper.putBoolean(context, IMCacheHelper.KEY_CIM_CONNECTION_STATE, true)
+        IMCacheHelper.putBoolean(context, IMCacheHelper.KEY_IM_CONNECTION_STATE, true)
         val autoBind = IMManagerHelper.autoBindAccount(context)
         onConnectionSuccess(autoBind)
     }

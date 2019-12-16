@@ -6,11 +6,11 @@ import android.os.Bundle
 import android.view.View
 import android.view.View.OnClickListener
 import android.widget.Toast
-import com.farsunset.ichat.example.R
 import kotlinx.android.synthetic.main.activity_system_chat.*
 import vip.qsos.im.adapter.SystemMsgListViewAdapter
 import vip.qsos.im.app.AbsIMActivity
 import vip.qsos.im.app.Constant
+import vip.qsos.im.demo.R
 import vip.qsos.im.lib.IMManagerHelper
 import vip.qsos.im.lib.model.Message
 import java.util.*
@@ -21,7 +21,7 @@ import java.util.*
  */
 class MessageActivity : AbsIMActivity(), OnClickListener {
 
-    lateinit var adapter: SystemMsgListViewAdapter
+    private lateinit var adapter: SystemMsgListViewAdapter
     private var list: ArrayList<Message> = arrayListOf()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -44,11 +44,8 @@ class MessageActivity : AbsIMActivity(), OnClickListener {
 
     override fun onMessageReceived(message: Message) {
         if (message.action == Constant.MessageAction.ACTION_999) {
-            //返回登录页面，停止接受消息
-            IMManagerHelper.stop(this)
             Toast.makeText(this, "你被系统强制下线!", Toast.LENGTH_LONG).show()
-            val intent = Intent(this, LoginActivity::class.java)
-            startActivity(intent)
+            goToLogin()
             this.finish()
         } else {
             list.add(message)
@@ -69,10 +66,14 @@ class MessageActivity : AbsIMActivity(), OnClickListener {
     }
 
     override fun onBackPressed() {
-        //返回登录页面，停止接受消息
-        IMManagerHelper.stop(this)
-        startActivity(Intent(this, LoginActivity::class.java))
+        goToLogin()
         super.onBackPressed()
     }
 
+    /**返回登录页面，停止接收消息*/
+    private fun goToLogin() {
+        IMManagerHelper.stop(this)
+        val intent = Intent(this, LoginActivity::class.java)
+        startActivity(intent)
+    }
 }

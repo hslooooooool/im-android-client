@@ -9,7 +9,7 @@ import android.content.Intent
 import android.net.NetworkInfo
 
 import androidx.core.app.NotificationCompat
-import com.farsunset.ichat.example.R
+import vip.qsos.im.demo.R
 
 import vip.qsos.im.lib.AbsIMEventBroadcastReceiver
 import vip.qsos.im.lib.IMListenerManager

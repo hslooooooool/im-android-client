@@ -23,7 +23,7 @@ object IMCacheHelper {
     /**服务器端口*/
     const val KEY_IM_SERVER_PORT = "KEY_IM_SERVER_PORT"
     /**服务器连接状态*/
-    const val KEY_CIM_CONNECTION_STATE = "KEY_CIM_CONNECTION_STATE"
+    const val KEY_IM_CONNECTION_STATE = "KEY_IM_CONNECTION_STATE"
     /**共享文件地址*/
     private const val CONTENT_URI = "content://%s.provider"
 

@@ -1,41 +1,30 @@
 package vip.qsos.im.ui
 
 import android.content.Intent
-import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
-
-import androidx.annotation.RequiresApi
-
-import com.farsunset.ichat.example.BuildConfig
-import com.farsunset.ichat.example.R
-
 import vip.qsos.im.app.AbsIMActivity
 import vip.qsos.im.app.Constant
+import vip.qsos.im.demo.BuildConfig
+import vip.qsos.im.demo.R
 import vip.qsos.im.lib.IMManagerHelper
 
 class SplashActivity : AbsIMActivity() {
 
-    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         IMManagerHelper.setLoggerEnable(this, BuildConfig.DEBUG)
-        IMManagerHelper.connect(
-            this@SplashActivity,
-            Constant.CIM_SERVER_HOST,
-            Constant.CIM_SERVER_PORT
-        )
+        IMManagerHelper.connect(this, Constant.IM_SERVER_HOST, Constant.IM_SERVER_PORT)
         val view = View.inflate(this, R.layout.activity_splansh, null)
         setContentView(view)
     }
 
-    override fun onConnectionSuccess(arg0: Boolean) {
+    override fun onConnectionSuccess(hasAutoBind: Boolean) {
         val intent = Intent(this@SplashActivity, LoginActivity::class.java)
         startActivity(intent)
         finish()
     }
-
 
     override fun onBackPressed() {
         finish()
