@@ -6,11 +6,8 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import android.net.NetworkInfo
-
 import androidx.core.app.NotificationCompat
 import vip.qsos.im.demo.R
-
 import vip.qsos.im.lib.AbsIMEventBroadcastReceiver
 import vip.qsos.im.lib.IMListenerManager
 import vip.qsos.im.lib.model.Message
@@ -57,7 +54,6 @@ class MyIMPushManagerReceiver : AbsIMEventBroadcastReceiver() {
         builder.setAutoCancel(true)
         builder.setDefaults(Notification.DEFAULT_ALL)
         builder.setWhen(msg.timestamp)
-        builder.setSmallIcon(R.drawable.icon)
         builder.setTicker(title)
         builder.setContentTitle(title)
         builder.setContentText(msg.content)
@@ -65,10 +61,6 @@ class MyIMPushManagerReceiver : AbsIMEventBroadcastReceiver() {
         builder.setContentIntent(contentIntent)
         val notification = builder.build()
         notificationManager.notify(R.drawable.icon, notification)
-    }
-
-    fun onNetworkChanged(info: NetworkInfo) {
-        IMListenerManager.notifyOnNetworkChanged(info)
     }
 
     override fun onConnectionSuccess(hasAutoBind: Boolean) {

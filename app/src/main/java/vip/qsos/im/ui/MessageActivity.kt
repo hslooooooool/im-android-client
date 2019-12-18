@@ -1,55 +1,76 @@
 package vip.qsos.im.ui
 
-import android.content.Intent
 import android.net.NetworkInfo
 import android.os.Bundle
-import android.view.View
-import android.view.View.OnClickListener
+import android.text.TextUtils
 import android.widget.Toast
-import kotlinx.android.synthetic.main.activity_system_chat.*
-import vip.qsos.im.adapter.SystemMsgListViewAdapter
+import kotlinx.android.synthetic.main.activity_message.*
+import vip.qsos.im.adapter.MessageAdapter
 import vip.qsos.im.app.AbsIMActivity
 import vip.qsos.im.app.Constant
 import vip.qsos.im.demo.R
 import vip.qsos.im.lib.IMManagerHelper
+import vip.qsos.im.lib.constant.IMConstant
 import vip.qsos.im.lib.model.Message
+import vip.qsos.im.lib.model.ReplyBody
 import java.util.*
 
 /**
  * @author : 华清松
  * 消息界面
  */
-class MessageActivity : AbsIMActivity(), OnClickListener {
+class MessageActivity : AbsIMActivity() {
 
-    private lateinit var adapter: SystemMsgListViewAdapter
-    private var list: ArrayList<Message> = arrayListOf()
+    private lateinit var mAdapter: MessageAdapter
+    private var mList: ArrayList<Message> = arrayListOf()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_system_chat)
+        setContentView(R.layout.activity_message)
         initViews()
     }
 
     private fun initViews() {
-        list = ArrayList()
-        top_back.setOnClickListener(this)
-        top_back.visibility = View.VISIBLE
-        top_back.text = "登录"
-        title_txt.text = "系统消息"
-        account_1.text = this.intent.getStringExtra("account")
-        adapter = SystemMsgListViewAdapter(this, list)
-        chat_list.adapter = adapter
-        Toast.makeText(this, "登录成功", Toast.LENGTH_LONG).show()
+        mList = ArrayList()
+        mAdapter = MessageAdapter(this, mList)
+        chat_list.adapter = mAdapter
+
+        login.setOnClickListener {
+            doLogin()
+        }
+    }
+
+    private fun doLogin() {
+        val account = account_1.text.toString().trim()
+        if (!TextUtils.isEmpty(account)) {
+            if (IMManagerHelper.isConnected(this)) {
+                IMManagerHelper.bindAccount(this, account)
+            } else {
+                IMManagerHelper.connect(this, Constant.IM_SERVER_HOST, Constant.IM_SERVER_PORT)
+            }
+        }
+    }
+
+    override fun onConnectionSuccess(hasAutoBind: Boolean) {
+        if (!hasAutoBind) {
+            IMManagerHelper.bindAccount(this, account_1.text.toString().trim { it <= ' ' })
+        }
+    }
+
+    override fun onReplyReceived(replyBody: ReplyBody) {
+        /**收到code为200的回应 账号绑定成功*/
+        if (replyBody.key == IMConstant.RequestKey.CLIENT_BIND && replyBody.code == IMConstant.ReturnCode.CODE_200) {
+            Toast.makeText(this, "登录成功", Toast.LENGTH_SHORT).show()
+        }
     }
 
     override fun onMessageReceived(message: Message) {
         if (message.action == Constant.MessageAction.ACTION_999) {
             Toast.makeText(this, "你被系统强制下线!", Toast.LENGTH_LONG).show()
-            goToLogin()
             this.finish()
         } else {
-            list.add(message)
-            adapter.notifyDataSetChanged()
+            mList.add(message)
+            mAdapter.notifyDataSetChanged()
         }
     }
 
@@ -61,19 +82,8 @@ class MessageActivity : AbsIMActivity(), OnClickListener {
         }
     }
 
-    override fun onClick(v: View) {
-        onBackPressed()
-    }
-
-    override fun onBackPressed() {
-        goToLogin()
-        super.onBackPressed()
-    }
-
-    /**返回登录页面，停止接收消息*/
-    private fun goToLogin() {
-        IMManagerHelper.stop(this)
-        val intent = Intent(this, LoginActivity::class.java)
-        startActivity(intent)
+    override fun onDestroy() {
+        IMManagerHelper.destroy(this)
+        super.onDestroy()
     }
 }

@@ -21,14 +21,14 @@ class SplashActivity : AbsIMActivity() {
     }
 
     override fun onConnectionSuccess(hasAutoBind: Boolean) {
-        val intent = Intent(this@SplashActivity, LoginActivity::class.java)
+        val intent = Intent(this@SplashActivity, MessageActivity::class.java)
         startActivity(intent)
         finish()
     }
 
     override fun onBackPressed() {
-        finish()
         IMManagerHelper.destroy(this)
+        finish()
     }
 
     override fun onConnectionFailed() {
