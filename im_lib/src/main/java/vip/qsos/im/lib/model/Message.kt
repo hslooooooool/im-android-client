@@ -1,12 +1,13 @@
 package vip.qsos.im.lib.model
 
-import java.io.Serializable
+import vip.qsos.im.lib.constant.IMConstant
+import vip.qsos.im.lib.model.proto.MessageProto
 
 /**
  * @author : 华清松
- * 自定义消息对象。
+ * 自定义消息对象
  */
-class Message : Serializable {
+class Message : IProtobufAble {
 
     companion object {
         private const val serialVersionUID = 1L
@@ -35,6 +36,23 @@ class Message : Serializable {
         timestamp = System.currentTimeMillis()
     }
 
+    override val type: Byte = IMConstant.ProtobufType.MESSAGE
+
+    override val byteArray: ByteArray
+        get() {
+            val builder = MessageProto.Model.newBuilder()
+            builder.id = id
+            builder.action = action
+            title?.let { builder.title = title }
+            builder.content = content
+            builder.sender = sender
+            builder.receiver = receiver
+            builder.format = format
+            extra?.let { builder.extra = extra }
+            builder.timestamp = timestamp
+            return builder.build().toByteArray()
+        }
+
     override fun toString(): String {
         return "\n#Message#" +
                 "\nid:" + id +
@@ -46,10 +64,6 @@ class Message : Serializable {
                 "\nreceiver:" + receiver +
                 "\nformat:" + format +
                 "\ntimestamp:" + timestamp
-    }
-
-    fun empty(txt: String?): Boolean {
-        return txt?.trim { it <= ' ' }?.isEmpty() ?: true
     }
 
 }

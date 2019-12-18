@@ -27,8 +27,9 @@ object IMManagerHelper {
     const val ACTION_CREATE_CONNECTION = "ACTION_CREATE_CONNECTION"
     /**【动作】消息服务器活跃检测，死掉将重连*/
     const val ACTION_ACTIVATE_PUSH_SERVICE = "ACTION_ACTIVATE_PUSH_SERVICE"
-
+    /**发送的消息数据*/
     const val KEY_SEND_BODY = "KEY_SEND_BODY"
+    /**连接状态*/
     const val KEY_CONNECTION_STATUS = "KEY_CONNECTION_STATUS"
 
     /**
