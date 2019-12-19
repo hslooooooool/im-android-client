@@ -2,9 +2,9 @@ package vip.qsos.im.ui
 
 import android.net.NetworkInfo
 import android.os.Bundle
-import android.text.TextUtils
 import android.widget.Toast
 import kotlinx.android.synthetic.main.activity_message.*
+import vip.qsos.im.AppApplication
 import vip.qsos.im.adapter.MessageAdapter
 import vip.qsos.im.app.AbsIMActivity
 import vip.qsos.im.app.Constant
@@ -34,31 +34,15 @@ class MessageActivity : AbsIMActivity() {
         mList = ArrayList()
         mAdapter = MessageAdapter(this, mList)
         chat_list.adapter = mAdapter
-
-        login.setOnClickListener {
-            doLogin()
-        }
-    }
-
-    private fun doLogin() {
-        val account = account_1.text.toString().trim()
-        if (!TextUtils.isEmpty(account)) {
-            if (IMManagerHelper.isConnected(this)) {
-                IMManagerHelper.bindAccount(this, account)
-            } else {
-                IMManagerHelper.connect(this, Constant.IM_SERVER_HOST, Constant.IM_SERVER_PORT)
-            }
-        }
     }
 
     override fun onConnectionSuccess(hasAutoBind: Boolean) {
         if (!hasAutoBind) {
-            IMManagerHelper.bindAccount(this, account_1.text.toString().trim { it <= ' ' })
+            IMManagerHelper.bindAccount(this, AppApplication.testAccount)
         }
     }
 
     override fun onReplyReceived(replyBody: ReplyBody) {
-        /**收到code为200的回应 账号绑定成功*/
         if (replyBody.key == IMConstant.RequestKey.CLIENT_BIND && replyBody.code == IMConstant.ReturnCode.CODE_200) {
             Toast.makeText(this, "登录成功", Toast.LENGTH_SHORT).show()
         }
@@ -80,10 +64,5 @@ class MessageActivity : AbsIMActivity() {
         } else {
             Toast.makeText(this, "网络已恢复，重新连接....", Toast.LENGTH_LONG).show()
         }
-    }
-
-    override fun onDestroy() {
-        IMManagerHelper.destroy(this)
-        super.onDestroy()
     }
 }

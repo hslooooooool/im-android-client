@@ -9,6 +9,10 @@ import vip.qsos.im.exception.GlobalExceptionHelper
  * AppApplication
  */
 open class AppApplication : Application() {
+    companion object {
+        var testAccount: String = "Sender"
+    }
+
     override fun onCreate() {
         super.onCreate()
         val exceptionHelper = GlobalExceptionHelper(this)
