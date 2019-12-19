@@ -3,6 +3,7 @@ package vip.qsos.im.app
 import android.app.Activity
 import android.net.NetworkInfo
 import android.os.Bundle
+import android.widget.Toast
 
 import vip.qsos.im.lib.IMEventListener
 import vip.qsos.im.lib.IMListenerManager
@@ -22,8 +23,8 @@ abstract class AbsIMActivity : Activity(), IMEventListener {
     }
 
     override fun finish() {
-        super.finish()
         IMListenerManager.removeMessageListener(this)
+        super.finish()
     }
 
     override fun onRestart() {
@@ -33,17 +34,31 @@ abstract class AbsIMActivity : Activity(), IMEventListener {
 
     override val eventDispatchOrder: Int = 0
 
-    override fun onMessageReceived(message: Message) {}
+    override fun onMessageReceived(message: Message) {
+        Toast.makeText(this, "收到消息", Toast.LENGTH_SHORT).show()
+    }
 
-    override fun onNetworkChanged(networkInfo: NetworkInfo?) {}
+    override fun onNetworkChanged(networkInfo: NetworkInfo?) {
+        Toast.makeText(this, "网络变化", Toast.LENGTH_SHORT).show()
+    }
 
-    override fun onConnectionClosed() {}
+    override fun onConnectionClosed() {
+        Toast.makeText(this, "连接关闭", Toast.LENGTH_SHORT).show()
+    }
 
-    override fun onConnectionFailed() {}
+    override fun onConnectionFailed() {
+        Toast.makeText(this, "连接失败", Toast.LENGTH_SHORT).show()
+    }
 
-    override fun onConnectionSuccess(hasAutoBind: Boolean) {}
+    override fun onConnectionSuccess(hasAutoBind: Boolean) {
+        Toast.makeText(this, "连接成功", Toast.LENGTH_SHORT).show()
+    }
 
-    override fun onReplyReceived(replyBody: ReplyBody) {}
+    override fun onReplyReceived(replyBody: ReplyBody) {
+        Toast.makeText(this, "收到回执", Toast.LENGTH_SHORT).show()
+    }
 
-    override fun onSentSuccess(sendBody: SendBody) {}
+    override fun onSentSuccess(sendBody: SendBody) {
+        Toast.makeText(this, "发送成功", Toast.LENGTH_SHORT).show()
+    }
 }
