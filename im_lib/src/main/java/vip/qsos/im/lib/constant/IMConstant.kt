@@ -4,7 +4,7 @@ package vip.qsos.im.lib.constant
  * @author : 华清松
  * 消息常量
  */
-interface IMConstant {
+open interface IMConstant {
 
     companion object {
         /**【定义】消息服务重连时长，毫秒*/
