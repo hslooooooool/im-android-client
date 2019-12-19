@@ -102,6 +102,9 @@ abstract class AbsIMEventBroadcastReceiver : BroadcastReceiver() {
     }
 
     private fun connect(delay: Long) {
+        if (IMManagerHelper.isConnected(context)){
+            return
+        }
         val serviceIntent = Intent(context, IMService::class.java)
         serviceIntent.putExtra(IMService.KEY_DELAYED_TIME, delay)
         serviceIntent.action = IMManagerHelper.ACTION_CREATE_CONNECTION

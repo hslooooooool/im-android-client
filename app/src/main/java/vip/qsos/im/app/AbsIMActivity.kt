@@ -26,10 +26,12 @@ abstract class AbsIMActivity : Activity(), IMEventListener {
         IMListenerManager.removeMessageListener(this)
     }
 
-    public override fun onRestart() {
+    override fun onRestart() {
         super.onRestart()
         IMListenerManager.registerMessageListener(this)
     }
+
+    override val eventDispatchOrder: Int = 0
 
     override fun onMessageReceived(message: Message) {}
 
@@ -38,8 +40,6 @@ abstract class AbsIMActivity : Activity(), IMEventListener {
     override fun onConnectionClosed() {}
 
     override fun onConnectionFailed() {}
-
-    override val eventDispatchOrder: Int = 0
 
     override fun onConnectionSuccess(hasAutoBind: Boolean) {}
 

@@ -1,2 +1,2 @@
 include ':app', ':im_lib'
-rootProject.name='im-sdk-android'
+rootProject.name='im-android-client'

@@ -60,7 +60,7 @@ class MyIMPushManagerReceiver : AbsIMEventBroadcastReceiver() {
         builder.setDefaults(Notification.DEFAULT_LIGHTS)
         builder.setContentIntent(contentIntent)
         val notification = builder.build()
-        notificationManager.notify(R.drawable.icon, notification)
+        notificationManager.notify(R.drawable.ic_launcher, notification)
     }
 
     override fun onConnectionSuccess(hasAutoBind: Boolean) {
