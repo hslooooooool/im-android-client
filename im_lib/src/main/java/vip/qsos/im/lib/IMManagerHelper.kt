@@ -2,7 +2,6 @@ package vip.qsos.im.lib
 
 import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager.NameNotFoundException
 import android.net.ConnectivityManager
 import android.net.NetworkInfo
 import android.os.Build
@@ -190,7 +189,7 @@ object IMManagerHelper {
         versionName = try {
             val mPackageInfo = context.packageManager.getPackageInfo(context.packageName, 0)
             mPackageInfo.versionName
-        } catch (ignore: NameNotFoundException) {
+        } catch (ignore: Exception) {
             "unknown"
         }
         return versionName

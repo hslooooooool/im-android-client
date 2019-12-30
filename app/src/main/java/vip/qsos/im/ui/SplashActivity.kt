@@ -39,6 +39,8 @@ class SplashActivity : AbsIMActivity() {
         if (replyBody.key == IMConstant.RequestKey.CLIENT_BIND && replyBody.code == IMConstant.ReturnCode.CODE_200) {
             val intent = Intent(this@SplashActivity, MessageActivity::class.java)
             startActivity(intent)
+        } else {
+            Toast.makeText(this, replyBody.message, Toast.LENGTH_SHORT).show()
         }
     }
 
