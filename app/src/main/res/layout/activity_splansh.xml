@@ -25,8 +25,8 @@
         android:layout_width="match_parent"
         android:layout_height="60dp"
         android:layout_margin="20dp"
-        android:hint="当前账号"
-        android:text="9999" />
+        android:hint="账号"
+        android:text="admin" />
 
     <Button
         android:id="@+id/im_login"

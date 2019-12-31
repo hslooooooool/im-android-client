@@ -56,7 +56,6 @@ class SplashActivity : AbsIMActivity() {
     private fun doLogin() {
         val account = im_account.text.toString().trim()
         AppApplication.testAccount = account
-
         if (!TextUtils.isEmpty(account)) {
             if (IMManagerHelper.isConnected(this)) {
                 IMManagerHelper.bindAccount(this, account)

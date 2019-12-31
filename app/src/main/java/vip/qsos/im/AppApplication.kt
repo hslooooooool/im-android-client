@@ -10,7 +10,7 @@ import vip.qsos.im.exception.GlobalExceptionHelper
  */
 open class AppApplication : Application() {
     companion object {
-        var testAccount: String = "Sender"
+        var testAccount: String = ""
     }
 
     override fun onCreate() {
