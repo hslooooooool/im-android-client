@@ -23,7 +23,7 @@ class Message : IProtobufAble {
     var content: String? = null
     /**消息发送者账号*/
     var sender: String? = null
-    /**消息发送者接收者*/
+    /**消息接收者*/
     var receiver: String? = null
     /**content 内容格式，如 text,json,xml数据格式*/
     var format: String? = null
