@@ -27,9 +27,9 @@ object IMListenerManager {
 
     /**注销消息广播监听*/
     fun removeMessageListener(listener: IMEventListener) {
-        for (i in mListenerList.indices) {
-            if (listener.javaClass == mListenerList[i].javaClass) {
-                mListenerList.removeAt(i)
+        mListenerList.forEachIndexed { index, _ ->
+            if (listener.javaClass == mListenerList[index].javaClass) {
+                mListenerList.removeAt(index)
             }
         }
     }
