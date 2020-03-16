@@ -27,9 +27,10 @@ object IMListenerManager {
 
     /**注销消息广播监听*/
     fun removeMessageListener(listener: IMEventListener) {
-        mListenerList.forEachIndexed { index, _ ->
-            if (listener.javaClass == mListenerList[index].javaClass) {
-                mListenerList.removeAt(index)
+        val list = mListenerList.iterator()
+        while (list.hasNext()) {
+            if (listener.javaClass == list.next().javaClass) {
+                list.remove()
             }
         }
     }
