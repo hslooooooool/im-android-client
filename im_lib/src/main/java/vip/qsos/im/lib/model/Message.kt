@@ -19,7 +19,7 @@ class Message : IProtobufAble {
     var action: String? = null
     /**消息标题*/
     var title: String? = null
-    /**消息类容，content 根据 format 数据格式进行解析*/
+    /**消息内容，content 根据 format 数据格式进行解析*/
     var content: String? = null
     /**消息发送者账号*/
     var sender: String? = null

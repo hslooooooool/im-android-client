@@ -2,6 +2,7 @@ package vip.qsos.im.ui
 
 import android.net.NetworkInfo
 import android.os.Bundle
+import android.text.TextUtils
 import android.widget.Toast
 import kotlinx.android.synthetic.main.activity_message.*
 import vip.qsos.im.AppApplication
@@ -13,6 +14,7 @@ import vip.qsos.im.lib.IMManagerHelper
 import vip.qsos.im.lib.constant.IMConstant
 import vip.qsos.im.lib.model.Message
 import vip.qsos.im.lib.model.ReplyBody
+import vip.qsos.im.lib.model.SendBody
 import java.util.*
 
 /**
@@ -34,6 +36,14 @@ class MessageActivity : AbsIMActivity() {
         mList = ArrayList()
         mAdapter = MessageAdapter(this, mList)
         chat_list.adapter = mAdapter
+        chat_send.setOnClickListener {
+            val content = chat_content.text.toString().trim()
+            if (TextUtils.isEmpty(content)) {
+                Toast.makeText(this, "请输入内容!", Toast.LENGTH_LONG).show()
+            } else {
+                sendMsg(content)
+            }
+        }
     }
 
     override fun onConnectionSuccess(hasAutoBind: Boolean) {
@@ -64,5 +74,12 @@ class MessageActivity : AbsIMActivity() {
         } else {
             Toast.makeText(this, "网络已恢复，重新连接....", Toast.LENGTH_LONG).show()
         }
+    }
+
+    private fun sendMsg(content: String) {
+        val sent = SendBody()
+        sent.key = "order"
+        sent.put("data", content)
+        IMManagerHelper.sendRequest(this, sent)
     }
 }

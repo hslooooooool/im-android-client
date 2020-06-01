@@ -12,7 +12,7 @@ interface Constant {
 
     companion object {
         /**服务端IP地址*/
-        var IM_SERVER_HOST = "192.168.1.103"
+        var IM_SERVER_HOST = "192.168.3.131"
         /**服务端消息端口*/
         var IM_SERVER_PORT = 23456
     }
